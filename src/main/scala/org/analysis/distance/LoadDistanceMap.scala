@@ -1,4 +1,4 @@
-package org.nfl.analysis.distance
+package org.analysis.distance
 
 import java.io.InputStream
 

@@ -1,13 +1,10 @@
-package com.placeiq.pagerank
+package org.analysis.ranking
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.graphx._
-import org.nfl.analysis.util.{LoadUtils, PageRankUtils}
-import PageRankUtils._
+import org.analysis.util.{LoadUtils, PageRankUtils}
 
 object PageRankScores extends LoadUtils {
-
-  type ScoreMap = Map[String, List[Double]]
 
   def main(args: Array[String]) {
 
@@ -26,10 +23,10 @@ object PageRankScores extends LoadUtils {
     )
 
     val teams = gameLines.flatMap { line => List(line.split(",")(0), line.split(",")(2)) }.distinct
-    val vidToTeamName = teams.map(team => (vertexIdFromName(team), team))
+    val vidToTeamName = teams.map(team => (PageRankUtils.vertexIdFromName(team), team))
 
     val namesRDD = VertexRDD[String](sc.parallelize(vidToTeamName))
-    val gameOutcomesRDD = sc.parallelize(gameLines.map(generateGameEdges))
+    val gameOutcomesRDD = sc.parallelize(gameLines.map(PageRankUtils.generateGameEdges))
 
     val inputGraph = Graph.fromEdgeTuples(gameOutcomesRDD, 1.0)
 

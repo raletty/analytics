@@ -1,11 +1,12 @@
-package org.nfl.analysis.util
+package org.analysis.util
 
-import com.placeiq.pagerank.PageRankScores.ScoreMap
 import org.apache.spark.graphx._
 import org.apache.spark.graphx.lib._
 import org.apache.spark.rdd.RDD
 
 object PageRankUtils {
+
+  type ScoreMap = Map[String, List[Double]]
 
   def generateGameEdges(gameLine: String): (VertexId, VertexId) = {
     val split = gameLine.split(",")

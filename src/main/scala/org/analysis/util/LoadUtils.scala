@@ -1,4 +1,4 @@
-package org.nfl.analysis.util
+package org.analysis.util
 
 import java.io.InputStream
 import scala.io.Source
