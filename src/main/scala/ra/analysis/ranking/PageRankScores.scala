@@ -1,14 +1,15 @@
-package org.analysis.ranking
+package ra.analysis.ranking
 
+import ra.analysis.ranking.pagerank.PageRankUtils._
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.graphx._
-import org.analysis.util.{LoadUtils, PageRankUtils}
+import org.analysis.util.LoadUtils
 
 object PageRankScores extends LoadUtils {
 
   def main(args: Array[String]) {
 
-    val gameLines = getData("/org/nfl/analysis/ranking/2015_game_scores")
+    val gameLines = getData("/ra/analysis/ranking/full_2015_game_scores")
 
     val sc = new SparkContext(new SparkConf()
       .setMaster("local[2]")
@@ -22,16 +23,16 @@ object PageRankScores extends LoadUtils {
       .set("spark.kryo.referenceTracking", "false")
     )
 
-    val teams = gameLines.flatMap { line => List(line.split(",")(0), line.split(",")(2)) }.distinct
-    val vidToTeamName = teams.map(team => (PageRankUtils.vertexIdFromName(team), team))
+    val teams = gameLines.flatMap { line => List(line.split(",")(4), line.split(",")(6)) }.distinct
+    val vidToTeamName = teams.map(team => (vertexIdFromName(team), team))
 
     val namesRDD = VertexRDD[String](sc.parallelize(vidToTeamName))
-    val gameOutcomesRDD = sc.parallelize(gameLines.map(PageRankUtils.generateGameEdges))
+    val gameOutcomesRDD = sc.parallelize(gameLines.map(generateGameEdge))
 
     val inputGraph = Graph.fromEdgeTuples(gameOutcomesRDD, 1.0)
 
-    val iterationScoresOutput = PageRankUtils.generateIterationScoresMap(inputGraph, namesRDD, 0.4, 12)
-    val convergenceScoresRDD = PageRankUtils.generateConvergenceRun(inputGraph, namesRDD, 0.001, 0.4)
+    val iterationScoresOutput = generateIterationScoresMap(inputGraph, namesRDD, 0.4, 12)
+    val convergenceScoresRDD = generateConvergenceRun(inputGraph, namesRDD, 0.001, 0.4)
 
     iterationScoresOutput foreach println
   }
