@@ -4,18 +4,45 @@ import org.apache.spark.graphx._
 import org.apache.spark.graphx.lib._
 import org.apache.spark.rdd.RDD
 import ra.analysis.ranking._
+import ra.analysis.ranking.pagerank.gradient.GradientBuilder
 
 object PageRankUtils {
 
   /**
    * Given an input game line, create an edge directing the loser to the winner.
    * @param gameLine -- line schema: [week, day, date, type, winner, away, loser, winner pts, loser pts]
+   * @return case class encompassing [loser, winner, week, away, differential]
+   */
+  def generateGameDescription(gameLine: String): GameDescription = {
+    val split = gameLine.split(",")
+    GameDescription(vertexIdFromName(split(6)),
+                    vertexIdFromName(split(4)),
+                    split(0).toInt,
+                    split(5).nonEmpty,
+                    split(7).toInt - split(8).toInt)
+  }
+
+  /**
+   * Given an input game line, create an edge directing the loser to the winner.
+   * @param gameDesc -- relevant fields from a game line
    * @return win-loss edge
    */
-  def generateWeightedGameEdge(gameLine: String): Edge[GameEdgeAttribute] = {
-    val split = gameLine.split(",")
-    val edgeAttr = GameEdgeAttribute(split(0).toInt, split(5).nonEmpty, split(7).toDouble - split(8).toDouble)
-    Edge(vertexIdFromName(split(6)), vertexIdFromName(split(4)), edgeAttr)
+  def generateWeightedGameEdge(gameDesc: GameDescription): Edge[GameEdgeAttribute] = {
+    val edgeAttr = GameEdgeAttribute(gameDesc.week, 1.0)
+    Edge(gameDesc.loser, gameDesc.winner, edgeAttr)
+  }
+
+  /**
+   * Given a game description, create a GameGradient that describes how each week should be
+   * weighted given certain attributes.
+   * @param descs -- sequence of game descriptions to transform into a game gradient
+   * @param builder -- object handling the mapping of weeks to weights
+   * @return game gradient for a given team
+   */
+  def buildTeamGradientEntry(descs: Seq[GameDescription], builder: GradientBuilder): GameGradient = {
+    descs.map { case GameDescription(_, _, week, away, difference) =>
+      (week, builder.evaluateGameWeight(week, away, difference))
+    }.toMap
   }
 
   /**

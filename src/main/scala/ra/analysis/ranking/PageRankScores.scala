@@ -3,7 +3,7 @@ package ra.analysis.ranking
 import ra.analysis.ranking.pagerank.PageRankUtils._
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.graphx._
-import org.analysis.util.LoadUtils
+import ra.analysis.util.LoadUtils
 
 object PageRankScores extends LoadUtils {
 

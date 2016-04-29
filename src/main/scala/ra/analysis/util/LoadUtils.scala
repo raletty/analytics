@@ -1,4 +1,4 @@
-package org.analysis.util
+package ra.analysis.util
 
 import java.io.InputStream
 import scala.io.Source

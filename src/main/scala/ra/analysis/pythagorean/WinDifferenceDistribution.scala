@@ -1,7 +1,7 @@
 package org.analysis.pythagorean
 
 import java.text.DecimalFormat
-import org.analysis.util.LoadUtils
+import ra.analysis.util.LoadUtils
 
 object WinDifferenceDistribution extends LoadUtils {
 

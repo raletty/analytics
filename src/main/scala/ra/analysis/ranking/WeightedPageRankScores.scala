@@ -3,9 +3,12 @@ package ra.analysis.ranking
 import org.apache.spark.graphx.{Graph, VertexRDD}
 import org.apache.spark.{SparkConf, SparkContext}
 import ra.analysis.ranking.PageRankScores._
+import ra.analysis.ranking.pagerank.EdgeWeightedPageRank
 import ra.analysis.ranking.pagerank.PageRankUtils._
+import ra.analysis.ranking.pagerank.gradient.BasicGradientBuilderNFL
+import ra.analysis.util.LoadUtils
 
-object WeightedPageRankScores {
+object WeightedPageRankScores extends LoadUtils {
 
   def main(args: Array[String]) {
 
@@ -25,13 +28,27 @@ object WeightedPageRankScores {
     )
 
     val teams = gameLines.flatMap { line => List(line.split(",")(4), line.split(",")(6))}.distinct
-    val numWeeks = gameLines.map { line => line.split(",")(0)}.distinct.size
 
     val vidToTeamName = teams.map(team => (vertexIdFromName(team), team))
     val namesRDD = VertexRDD[String](sc.parallelize(vidToTeamName))
 
-    val gameOutcomesRDD = sc.parallelize(gameLines.map(generateWeightedGameEdge))
-    val gameGraph = Graph.fromEdges(gameOutcomesRDD, null)
+    val gameDescriptions = gameLines.map(generateGameDescription)
+    val teamGradients: TeamGradient = gameDescriptions.groupBy(_.loser).mapValues {
+      case (descriptions: Seq[GameDescription]) => buildTeamGradientEntry(descriptions, new BasicGradientBuilderNFL)
+    }
+
+    val gameEdgeRDD = sc.parallelize(gameDescriptions.map(generateWeightedGameEdge))
+    val gameGraph = Graph.fromEdges(gameEdgeRDD, null)
+
+//    gameGraph.edges foreach println
+//    teamGradients foreach println
+
+    val weightedIterationsOutput = EdgeWeightedPageRank.runWeightedPageRank(
+      gameGraph,
+      teamGradients,
+      startingWeight = 0.4,
+      numIterations = 20
+    )
 
   }
 
