@@ -30,7 +30,7 @@ object WinDifferenceDistribution extends LoadUtils {
   def main(args: Array[String]) = {
 
     // Gather pythogorean win input from resources (1988 through 2014).
-    val inputLines = getData("/org/analysis/pythagorean/wins_expwins_1988_2014.csv")
+    val inputLines = getData("/ra/analysis/pythagorean/wins_expwins_1988_2014.csv")
 
     // Format input file to grab relevant statistics.
     // Output: (team, year, actual wins, expected wins)

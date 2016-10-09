@@ -22,17 +22,51 @@ use LWP::Simple;
     'SEA','TAM','OTI','WAS'
 );
 
-@players = ('M/MurrDe00','P/PeteAd01','C/CharJa00','M/McCoLe01','D/DrewMa00','R/RiceRa00','T/TurnMi00','J/JohnCh04','F/FostAr00','J/JackSt00','F/FortMa00','L/LyncMa00','G/GoreFr00');
+# 32 Best running backs of the 21st century.
+@players = (
+    'A/AlexSh00',
+    'B/BarbTi00',
+    'B/BettJe00',
+    'C/CharJa00',
+    'D/DillCo00',
+    'D/DrewMa00',
+    'D/DunnWa00',
+    'F/FaulMa00',
+    'F/FortMa00',
+    'F/FostAr00',
+    'G/GeorEd00',
+    'G/GoreFr00',
+    'G/GreeAh00',
+    'H/HolmPr00',
+    'J/JackSt00',
+    'J/JameEd00',
+    'J/JohnCh04',
+    'J/JoneTh00',
+    'L/LewiJa00',
+    'L/LyncMa00',
+    'M/MartCu00',
+    'M/McAlDe00',
+    'M/MurrDe00',
+    'M/McCoLe01',
+    'P/PeteAd01',
+    'P/PortCl00',
+    'R/RiceRa00',
+    'T/TaylFr00',
+    'T/TomlLa00',
+    'T/TurnMi00',
+    'W/WestBr00',
+    'W/WillRi00'
+);
 
 $baseURL = "http://www.pro-football-reference.com/players/";
 $rushURL = "/rushing-plays/";
 
-open (IND, '>', "rush.csv");
+open (IND, '>', "21st_century_rushers.csv");
 print IND "Player,Team,Quarter,Time Left,Down,Yards To Go,Location,Score,Yards Rushed\n";
 
 foreach (@players) {
     
-    foreach ($year = 2007; $year <= 2015; $year++) {
+    foreach ($year = 1994; $year <= 2015; $year++) {
 	
 	$URL = $baseURL . $_ . $rushURL . $year;
 	print "$URL\n";
