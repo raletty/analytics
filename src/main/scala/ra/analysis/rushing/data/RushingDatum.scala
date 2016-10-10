@@ -17,6 +17,7 @@ case class RushingDatum(
   oppScore: Int,
   yardsRushed: Double
 ) {
+
   import RushingDatum._
 
   def locationToYardsLeft: Int = location.split(" ").toList match {
@@ -78,7 +79,6 @@ object RushingDatum {
   private val scores = "(\\d+)-(\\d+)".r
 
   def splitLine(line: String) = {
-    // Edgerrin James,ARI,2,13:07,1,10,CRD 12,0-0,18
     val lineSplit = line.split(",", -1)
     val scores(teamScore, oppScore) = lineSplit(7)
     (

@@ -1,7 +1,8 @@
 package ra.analysis.rushing
 
-import ra.analysis.rushing.data.{AnalyzedRushRange, RushingDatum}
+import ra.analysis.rushing.data.{NormalizedRushRange, AnalyzedRushRange, RushingDatum}
 import ra.analysis.util.LoadUtils
+import scala.collection.breakOut
 
 object EvaluateRushers extends LoadUtils {
 
@@ -15,20 +16,28 @@ object EvaluateRushers extends LoadUtils {
 
     val parsedData: Seq[RushingDatum] = RushingDatum.parseData(rushingData.drop(1))
 
-    val averageRushByLocation: Seq[AnalyzedRushRange] =
+    val averageRushRanges: Seq[AnalyzedRushRange] =
       RushingDatum.
         findAverageRushByLocation(parsedData)
 
     val playerRushByLocation: Map[String, Seq[AnalyzedRushRange]] =
       parsedData.
-        groupBy(_.playerName).
-        mapValues(RushingDatum.findAverageRushByLocation)
+        groupBy { _.playerName }.
+        mapValues { RushingDatum.findAverageRushByLocation }
 
-    averageRushByLocation foreach println
+    val normalizedPlayerRanges: Seq[(String, Seq[NormalizedRushRange])] =
+      playerRushByLocation.
+        map { case (playerName, playerRushRanges) =>
+          val toNormalizedRushRange = (AnalyzedRushRange.produceComparisonToAverage(32, 1.0) _).tupled
+          val normalizedRanges = (playerRushRanges zip averageRushRanges).map { toNormalizedRushRange }
+          (playerName, normalizedRanges)
+        } (breakOut)
 
+    println(averageRushRanges)
     println
-
-    playerRushByLocation foreach println
+    playerRushByLocation.foreach(println)
+    println
+    normalizedPlayerRanges.foreach(println)
 
   }
 
