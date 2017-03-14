@@ -1,8 +1,10 @@
-package ra.analysis
+package ra.analysis.ranking.pagerank
 
 import org.apache.spark.graphx.VertexId
+import ra.analysis.ranking.pagerank.gradient.GradientBuilder
+import ra.analysis.util.LoadUtils.getData
 
-package object ranking {
+object models {
 
   // Class for extracting relevant info from game scores.
   case class GameDescription(loser: VertexId, winner: VertexId, week: Int, away: Boolean, scoreDiff: Int)
@@ -17,4 +19,17 @@ package object ranking {
   // Shorthand type for iteration scores output.
   type ScoreMap = Map[String, List[Double]]
 
+
+
+  trait GameOps[A] {
+    def resourceFilename: String
+    def gradientBuilder: GradientBuilder
+    def generateGameDescription: String => GameDescription
+
+    lazy val gameLines: Seq[String] = getData(resourceFilename)
+  }
+
+  case class GameOpsAux extends GameOps
+
+  implicit object NFLOps extends GameOpsAux
 }
