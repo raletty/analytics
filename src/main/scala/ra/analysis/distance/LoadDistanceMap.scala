@@ -1,4 +1,4 @@
-package org.analysis.distance
+package ra.analysis.distance
 
 import java.io.InputStream
 

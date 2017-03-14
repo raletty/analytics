@@ -1,9 +1,9 @@
-package org.analysis.pythagorean
+package ra.analysis.pythagorean
 
 import java.text.DecimalFormat
-import ra.analysis.util.LoadUtils
+import ra.analysis.util.LoadUtils.getData
 
-object WinDifferenceDistribution extends LoadUtils {
+object WinDifferenceDistribution {
 
   /**
    * Round input double to a certain value.
