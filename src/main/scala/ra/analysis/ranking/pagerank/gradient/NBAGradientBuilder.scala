@@ -1,6 +1,8 @@
 package ra.analysis.ranking.pagerank.gradient
 
-class NBAGradientBuilder extends GradientBuilder {
+import ra.analysis.ranking.pagerank.models.NBA
+
+class NBAGradientBuilder extends GradientBuilder[NBA] {
   val numWeeks: Int = 82
 
   val tierInterval: Int = 5

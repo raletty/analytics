@@ -7,25 +7,32 @@ import org.apache.spark.{SparkConf, SparkContext}
 
 import ra.analysis.ranking.pagerank.models._
 import ra.analysis.ranking.pagerank.rdd.PageRankRDDUtils._
-import ra.analysis.util.LoadUtils.getData
 
 object PageRankScoresWithRDDs {
 
-  def main(args: Array[String]) {
+  def runPageRankWithRDDs[A <: Sport : GameOps](
+    resetProb: Double,
+    numIters: Int
+  ): ScoreMap = {
 
-    val gameLines = getData("/ra/analysis/ranking/full_2015_game_scores")
+    val gameOps   = implicitly[GameOps[A]]
+    val gameLines = gameOps.gameLines
+    val teams     = gameOps.teams
 
     val sc = new SparkContext(new SparkConf()
       .setMaster("local[*]")
       .setAppName("PageRankScores")
     )
 
-    val teams = gameLines.flatMap { line => List(line.split(",")(4), line.split(",")(6)) }.distinct
     val vidToTeamName = teams.map(team => (vertexIdFromName(team), team))
-    val teamNamesRDD: VertexRDD[String] = VertexRDD[String](sc.parallelize(vidToTeamName))
+    val teamNamesRDD  = VertexRDD[String](sc.parallelize(vidToTeamName))
 
-    val gameOutcomesRDD: RDD[(VertexId, VertexId)] = sc.parallelize(gameLines.map(generateGameEdge))
-    val inputGraph: Graph[Double, PartitionID] = Graph.fromEdgeTuples(gameOutcomesRDD, 1.0)
+    val gameEdges: Seq[(VertexId, VertexId)] = gameLines.
+      map(gameOps.generateGameDescription).
+      map { desc => (desc.loser, desc.winner) }
+
+    val gameOutcomesRDD: RDD[(VertexId, VertexId)]  = sc.parallelize(gameEdges)
+    val inputGraph: Graph[Double, PartitionID]      = Graph.fromEdgeTuples(gameOutcomesRDD, 1.0)
 
     val iterationScoresOutput: ScoreMap = generateIterationScoresMap[PartitionID, Double](
       inputGraph = inputGraph,
@@ -34,9 +41,7 @@ object PageRankScoresWithRDDs {
       iterations = 12
     )
 
-    // val convergenceScoresRDD = generateConvergenceRun(inputGraph, teamNamesRDD, 0.001, 0.4)
-    iterationScoresOutput foreach println
-
+    iterationScoresOutput
   }
 
 }

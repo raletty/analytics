@@ -1,6 +1,8 @@
 package ra.analysis.ranking.pagerank.gradient
 
-trait GradientBuilder {
+import ra.analysis.ranking.pagerank.models.Sport
+
+trait GradientBuilder[A <: Sport] {
 
   val numWeeks: Int
   val isHome: Double

@@ -6,16 +6,17 @@ import org.apache.spark.{SparkConf, SparkContext}
 import ra.analysis.ranking.pagerank.models
 import models._
 import ra.analysis.ranking.pagerank.rdd.PageRankRDDUtils._
-import ra.analysis.ranking.pagerank.gradient.NFLGradientBuilder
-import ra.analysis.util.LoadUtils._
 
 object WeightedPageRankScoresWithRDDs {
 
-  def runWeightedPageRankWithRDDs[A : GameOps](
+  def runWeightedPageRankWithRDDs[A <: Sport : GameOps](
     resetProb: Double,
     numIters: Int
   ): ScoreMap = {
-    val gameLines = getData("/ra/analysis/ranking/full_2015_game_scores")
+
+    val gameOps   = implicitly[GameOps[A]]
+    val gameLines = gameOps.gameLines
+    val teams     = gameOps.teams
 
     val sc = new SparkContext(
       new SparkConf()
@@ -23,16 +24,13 @@ object WeightedPageRankScoresWithRDDs {
         .setAppName("WeightedPageRankScoresWithRDDs")
     )
 
-//    val gameOps = implicitly[GameOps[A]]
-
-    val teams = gameLines.flatMap { line => List(line.split(",")(4), line.split(",")(6)) }.distinct
     val vidToTeamName = teams.map(team => (vertexIdFromName(team), team))
     val teamNamesRDD = VertexRDD[String](sc.parallelize(vidToTeamName))
 
-    val gameDescriptions = gameLines.map(generateGameDescription)
+    val gameDescriptions = gameLines.map(gameOps.generateGameDescription)
     val teamGradients: TeamGradient = gameDescriptions.
       groupBy(_.loser).
-      mapValues { buildTeamGradientEntry(new NFLGradientBuilder) }.
+      mapValues { buildTeamGradientEntry[A](gameOps.gradientBuilder) }.
       map(identity)
 
     val gameEdgeRDD = sc.parallelize(gameDescriptions.map(generateWeightedGameEdge))
@@ -40,10 +38,10 @@ object WeightedPageRankScoresWithRDDs {
 
     val teamGradientBroadcast: Broadcast[TeamGradient] = sc.broadcast(teamGradients)
     val weightedIterationOutput = generateIterationScoresMap[GameEdgeAttribute, GameEdgeAttribute](
-      inputGraph = gameGraph,
+      inputGraph    = gameGraph,
       runIterations = EdgeWeightedPageRank.run[Double](teamGradientBroadcast, 0.4),
-      teamNamesRDD = teamNamesRDD,
-      iterations = 12
+      teamNamesRDD  = teamNamesRDD,
+      iterations    = 12
     )
 
     weightedIterationOutput

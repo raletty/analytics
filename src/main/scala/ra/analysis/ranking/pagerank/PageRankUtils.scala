@@ -6,65 +6,73 @@ import ra.analysis.ranking.pagerank.gradient.GradientBuilder
 
 trait PageRankUtils {
 
-  /**
-   * Given an input game line, create an edge directing the loser to the winner.
-   *
-   * @param gameLine -- line schema: [week, day, date, type, winner, away, loser, winner pts, loser pts]
-   * @return case class encompassing [loser, winner, week, away, differential]
-   */
-  def generateGameDescription(gameLine: String): GameDescription = {
+  // Given input game line, creates an NFL game description.
+  def generateNflGameDescription(gameLine: String): Describable[NFL] = {
     val split = gameLine.split(",")
-    GameDescription(
-      loser     = vertexIdFromName(split(6)),
-      winner    = vertexIdFromName(split(4)),
-      week      = split(0).toInt,
-      away      = split(5).nonEmpty,
-      scoreDiff = split(7).toInt - split(8).toInt
+    NflGameDescription(
+      loser       = vertexIdFromName(split(6)),
+      winner      = vertexIdFromName(split(4)),
+      gameNumber  = split(0).toInt,
+      away        = split(5).nonEmpty,
+      scoreDiff   = split(7).toInt - split(8).toInt
     )
   }
 
-  /**
-   * Given an input game line, create an edge directing the loser to the winner.
-   *
-   * @param gameDesc -- relevant fields from a game line
-   * @return win-loss edge
-   */
-  def generateWeightedGameEdge(gameDesc: GameDescription): Edge[GameEdgeAttribute] = {
-    val edgeAttr = GameEdgeAttribute(gameDesc.week, 1.0)
+  def generateNbaGameDescription(gameLine: String): Describable[NBA] = {
+    val split = gameLine.split(",")
+
+    val (winner, loser, scoreDiff) =
+      if (split(5) == "W") (split(0), split(4), split(7).toInt - split(8).toInt)
+      else                 (split(4), split(0), split(8).toInt - split(7).toInt)
+
+    NbaGameDescription(
+      loser       = vertexIdFromName(loser),
+      winner      = vertexIdFromName(winner),
+      date        = split(2),
+      gameNumber  = split(1).toInt,
+      away        = split(3).nonEmpty,
+      scoreDiff   = scoreDiff
+    )
+  }
+
+  // Given some game lines, generate all teams for that sport.
+  def generateNflTeams(gameLines: Seq[String]): Seq[String] = {
+    gameLines.flatMap { line =>
+      val split = line.split(",")
+      List(split(4), split(6))
+    }.distinct
+  }
+
+  def generateNbaTeams(gameLines: Seq[String]): Seq[String] = {
+    gameLines.flatMap { line =>
+      val split = line.split(",")
+      List(split(0), split(4))
+    }.distinct
+  }
+
+  // Given a game description, creates a weighted game edge.
+  def generateWeightedGameEdge[A <: Sport](gameDesc: Describable[A]): Edge[GameEdgeAttribute] = {
+    val edgeAttr = GameEdgeAttribute(gameDesc.gameNumber, 1.0)
     Edge(gameDesc.loser, gameDesc.winner, edgeAttr)
   }
 
-  /**
-   * Given a game description, create a GameGradient that describes how each week should be
-   * weighted given certain attributes.
-   *
-   * @param descs -- sequence of game descriptions to transform into a game gradient
-   * @param builder -- object handling the mapping of weeks to weights
-   * @return game gradient for a given team
-   */
-  def buildTeamGradientEntry(builder: GradientBuilder)(descs: Seq[GameDescription]): GameGradient = {
-    descs.map { case GameDescription(_, _, week, away, difference) =>
-      (week, builder.evaluateGameWeight(week, away, difference))
+  // Applies a gradient builder to a set of descriptions to produce a gradient.
+  def buildTeamGradientEntry[A <: Sport](
+    builder: GradientBuilder[A]
+  )(
+    descriptions: Seq[Describable[A]]
+  ): GameGradient = {
+    descriptions.map {
+      case NflGameDescription(_, _, gameNumber, away, difference) =>
+        (gameNumber, builder.evaluateGameWeight(gameNumber, away, difference))
+      case NbaGameDescription(_, _, _, gameNumber, away, difference) =>
+        (gameNumber, builder.evaluateGameWeight(gameNumber, away, difference))
     }.toMap
   }
 
-  /**
-   * Given an input game line, generate a non-attribute edge pointing the loser to the winner.
-   *
-   * @param gameLine -- input line to draw edge from
-   * @return -- vertex tuple simulating an edge (graph will be created from a set of these)
-   */
-  def generateGameEdge(gameLine: String): (VertexId, VertexId) = {
-    val split = gameLine.split(",")
-    (vertexIdFromName(split(6)), vertexIdFromName(split(4)))
-  }
-
-  /**
-   * Standardize team name and create a vertex ID from it.
- *
-   * @param name -- input team name
-   * @return -- vertex ID
-   */
+  // Used to transform team names into vertex ID's.
   def vertexIdFromName(name: String): VertexId = name.replaceAll("\\s", "").toLowerCase.hashCode
 
 }
+
+object PageRankUtils extends PageRankUtils
