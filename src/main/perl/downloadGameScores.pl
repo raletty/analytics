@@ -1,6 +1,5 @@
 use LWP::Simple;
 
-
 $baseURL = "http://www.pro-football-reference.com/years/";
 $endURL = "/games.htm";
 
