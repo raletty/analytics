@@ -1,14 +1,14 @@
 package ra.analysis.ranking.pagerank
 
 import org.apache.spark.graphx.VertexId
-import ra.analysis.ranking.pagerank.gradient.{NBAGradientBuilder, NFLGradientBuilder, GradientBuilder}
+import ra.analysis.ranking.pagerank.gradient.{NbaGradientBuilder, NflGradientBuilder, GradientBuilder}
 import ra.analysis.util.LoadUtils.getData
 
 object models {
 
   sealed trait Sport
-  class NFL extends Sport
-  class NBA extends Sport
+  class Nfl extends Sport
+  class Nba extends Sport
 
   // Class for extracting relevant info from game scores.
   trait Describable[A <: Sport] {
@@ -25,7 +25,7 @@ object models {
     gameNumber: Int,
     away: Boolean,
     scoreDiff: Int
-  ) extends Describable[NFL]
+  ) extends Describable[Nfl]
 
   case class NbaGameDescription(
     loser: VertexId,
@@ -34,7 +34,7 @@ object models {
     gameNumber: Int,
     away: Boolean,
     scoreDiff: Int
-  ) extends Describable[NBA]
+  ) extends Describable[Nba]
 
   // Edge attribute in rank graph.
   case class GameEdgeAttribute(week: Int, weight: Double)
@@ -63,16 +63,16 @@ object models {
     generateGameDescription: String => Describable[A]
   ) extends GameOps[A]
 
-  implicit object NFLOps extends GameOpsAux[NFL](
+  implicit object NFLOps extends GameOpsAux[Nfl](
     resourceFilename = "/ra/analysis/ranking/full_2015_game_scores",
-    gradientBuilder = new NFLGradientBuilder,
+    gradientBuilder = new NflGradientBuilder,
     generateTeams = PageRankUtils.generateNflTeams,
     generateGameDescription = PageRankUtils.generateNflGameDescription
   )
 
-  implicit object NBAOps extends GameOpsAux[NBA](
+  implicit object NBAOps extends GameOpsAux[Nba](
     resourceFilename = "/ra/analysis/ranking/full_2017_nba_game_scores",
-    gradientBuilder = new NBAGradientBuilder,
+    gradientBuilder = new NbaGradientBuilder,
     generateTeams = PageRankUtils.generateNbaTeams,
     generateGameDescription = PageRankUtils.generateNbaGameDescription
   )

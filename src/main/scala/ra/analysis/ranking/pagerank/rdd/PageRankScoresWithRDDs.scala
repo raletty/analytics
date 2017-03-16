@@ -29,6 +29,7 @@ object PageRankScoresWithRDDs {
 
     val gameEdges: Seq[(VertexId, VertexId)] = gameLines.
       map(gameOps.generateGameDescription).
+      distinct.
       map { desc => (desc.loser, desc.winner) }
 
     val gameOutcomesRDD: RDD[(VertexId, VertexId)]  = sc.parallelize(gameEdges)

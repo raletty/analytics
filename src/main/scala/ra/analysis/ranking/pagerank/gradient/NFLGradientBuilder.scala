@@ -2,7 +2,7 @@ package ra.analysis.ranking.pagerank.gradient
 
 import ra.analysis.ranking.pagerank.models.NFL
 
-class NFLGradientBuilder extends GradientBuilder[NFL] {
+class NflGradientBuilder extends GradientBuilder[NFL] {
 
   // Home teams had a record of 136-117 (away wins to weighted ~1.1623 higher).
   val isHome = 117.0 / 136.0

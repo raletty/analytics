@@ -2,7 +2,7 @@ package ra.analysis.ranking.pagerank.gradient
 
 import ra.analysis.ranking.pagerank.models.NBA
 
-class NBAGradientBuilder extends GradientBuilder[NBA] {
+class NbaGradientBuilder extends GradientBuilder[NBA] {
   val numWeeks: Int = 82
 
   val tierInterval: Int = 5
