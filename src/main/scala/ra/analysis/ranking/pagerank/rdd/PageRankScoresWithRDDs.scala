@@ -16,7 +16,7 @@ object PageRankScoresWithRDDs {
   ): ScoreMap = {
 
     val gameOps   = implicitly[GameOps[A]]
-    val gameLines = gameOps.gameLines
+    val gameLines = gameOps.gameLines.tail
     val teams     = gameOps.teams
 
     val sc = new SparkContext(new SparkConf()
@@ -24,12 +24,14 @@ object PageRankScoresWithRDDs {
       .setAppName("PageRankScores")
     )
 
-    val vidToTeamName = teams.map(team => (vertexIdFromName(team), team))
-    val teamNamesRDD  = VertexRDD[String](sc.parallelize(vidToTeamName))
+    val vidToTeamName: Seq[(VertexId, String)] = teams.map(team => (vertexIdFromName(team), team))
+    val teamNamesRDD: VertexRDD[String] = VertexRDD[String](sc.parallelize(vidToTeamName))
 
-    val gameEdges: Seq[(VertexId, VertexId)] = gameLines.
+    val gameDescriptions: Seq[Describable[A]] = gameLines.
       map(gameOps.generateGameDescription).
-      distinct.
+      collect { case Some(desc) => desc }
+
+    val gameEdges: Seq[(VertexId, VertexId)] = gameDescriptions.
       map { desc => (desc.loser, desc.winner) }
 
     val gameOutcomesRDD: RDD[(VertexId, VertexId)]  = sc.parallelize(gameEdges)

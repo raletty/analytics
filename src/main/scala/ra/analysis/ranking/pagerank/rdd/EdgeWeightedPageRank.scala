@@ -50,8 +50,6 @@ object EdgeWeightedPageRank {
         TripletFields.Src
       )
 
-      rankUpdates foreach println
-
       prevWeightedRankGraph = weightedRankGraph
       weightedRankGraph = weightedRankGraph.joinVertices(rankUpdates) {
         (id, _, msgSum) => startingWeight + (1.0 - startingWeight) * msgSum

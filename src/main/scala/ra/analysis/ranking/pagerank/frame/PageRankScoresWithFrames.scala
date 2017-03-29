@@ -26,6 +26,7 @@ object PageRankScoresWithFrames {
     val teamNamesFrame = teams.map(TeamName.apply).toDF()
     val gameOutcomesFrame = gameLines.
       map(gameOps.generateGameDescription).
+      collect { case Some(desc) => desc }.
       map { desc => (desc.loser, desc.winner) }.
       map(GameOutcome.tupled).toDF("src", "dst")
     val inputGraphFrame = GraphFrame(teamNamesFrame, gameOutcomesFrame)

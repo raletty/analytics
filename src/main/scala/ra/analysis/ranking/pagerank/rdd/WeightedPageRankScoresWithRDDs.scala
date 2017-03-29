@@ -15,7 +15,7 @@ object WeightedPageRankScoresWithRDDs {
   ): ScoreMap = {
 
     val gameOps   = implicitly[GameOps[A]]
-    val gameLines = gameOps.gameLines
+    val gameLines = gameOps.gameLines.tail
     val teams     = gameOps.teams
 
     val sc = new SparkContext(
@@ -27,7 +27,10 @@ object WeightedPageRankScoresWithRDDs {
     val vidToTeamName = teams.map(team => (vertexIdFromName(team), team))
     val teamNamesRDD = VertexRDD[String](sc.parallelize(vidToTeamName))
 
-    val gameDescriptions = gameLines.map(gameOps.generateGameDescription)
+    val gameDescriptions: Seq[Describable[A]] = gameLines.
+      map(gameOps.generateGameDescription).
+      collect { case Some(desc) => desc }
+
     val teamGradients: TeamGradient = gameDescriptions.
       groupBy(_.loser).
       mapValues { buildTeamGradientEntry[A](gameOps.gradientBuilder) }.

@@ -7,32 +7,30 @@ import ra.analysis.ranking.pagerank.gradient.GradientBuilder
 trait PageRankUtils {
 
   // Given input game line, creates an NFL game description.
-  def generateNflGameDescription(gameLine: String): Describable[NFL] = {
+  def generateNflGameDescription(gameLine: String): Option[Describable[NFL]] = {
     val split = gameLine.split(",")
-    NflGameDescription(
-      loser       = vertexIdFromName(split(6)),
-      winner      = vertexIdFromName(split(4)),
-      gameNumber  = split(0).toInt,
-      away        = split(5).nonEmpty,
-      scoreDiff   = split(7).toInt - split(8).toInt
+    Some(
+      NflGameDescription(
+        loser       = vertexIdFromName(split(6)),
+        winner      = vertexIdFromName(split(4)),
+        gameNumber  = split(0).toInt,
+        away        = split(5).nonEmpty,
+        scoreDiff   = split(7).toInt - split(8).toInt
+      )
     )
   }
 
-  def generateNbaGameDescription(gameLine: String): Describable[NBA] = {
+  def generateNbaGameDescription(gameLine: String): Option[Describable[NBA]] = {
     val split = gameLine.split(",")
 
-    val (winner, loser, scoreDiff) =
-      if (split(5) == "W") (split(0), split(4), split(7).toInt - split(8).toInt)
-      else                 (split(4), split(0), split(8).toInt - split(7).toInt)
-
     NbaGameDescription(
-      loser       = vertexIdFromName(loser),
-      winner      = vertexIdFromName(winner),
+      loser       = vertexIdFromName(split(4)),
+      winner      = vertexIdFromName(split(0)),
       date        = split(2),
       gameNumber  = split(1).toInt,
       away        = split(3).nonEmpty,
-      scoreDiff   = scoreDiff
-    )
+      scoreDiff   = split(6).toInt - split(7).toInt
+    ).optionOn(split(5) == "W")
   }
 
   // Given some game lines, generate all teams for that sport.
