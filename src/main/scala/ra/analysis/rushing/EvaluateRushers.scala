@@ -8,7 +8,7 @@ object EvaluateRushers {
 
   def main(args: Array[String]) = {
 
-    val rushingData: Seq[String] = getData("/ra/analysis/rushing/21st_century_rushers.csv")
+    val rushingData: Seq[String] = getData("/ra/analysis/rushing/21st_century_rushers")
 
     /**
      * Player,Team,Quarter,Time Left,Down,Yards To Go,Location,Score,Yards Rushed
