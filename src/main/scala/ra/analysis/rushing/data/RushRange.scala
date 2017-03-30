@@ -1,6 +1,7 @@
 package ra.analysis.rushing.data
 
 trait RushRange {
+  def range: YardRange
   def csvString: String
 }
 
@@ -55,6 +56,7 @@ object AnalyzedRushRange {
     playerRange: AnalyzedRushRange,
     averageRange: AnalyzedRushRange
   ): NormalizedRushRange = {
+
     require(playerRange.range == averageRange.range)
 
     val avgAverageRush = averageRange.averageRush

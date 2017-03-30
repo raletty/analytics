@@ -20,7 +20,7 @@ case class RushingDatum(
 
   import RushingDatum._
 
-  def locationToYardsLeft: Int = location.split(" ").toList match {
+  val locationToYardsLeft: Int = location.split(" ").toList match {
     case side :: yardLine :: Nil if fieldToTeamMap.getOrElse(side, "") == team =>
       100 - yardLine.toOptInt.getOrElse(Integer.MIN_VALUE)
     case side :: yardLine :: Nil =>
@@ -35,7 +35,7 @@ case class RushingDatum(
       find { _.contains(locationToYardsLeft) }
   }
 
-  def scoredTouchdown: Boolean = (yardsToGo - yardsRushed) == 0.0
+  def scoredTouchdown: Boolean = (locationToYardsLeft - yardsRushed) == 0.0
 
   def totalTimeLeft: String = {
     val timeSplit = timeLeft.split(":")
@@ -82,8 +82,16 @@ object RushingDatum {
     val lineSplit = line.split(",", -1)
     val scores(teamScore, oppScore) = lineSplit(7)
     (
-      lineSplit(0).toOptStr, lineSplit(1).toOptStr, lineSplit(2).toOptInt, lineSplit(3).toOptStr, lineSplit(4).toOptInt,
-      lineSplit(5).toOptInt, lineSplit(6).toOptStr, teamScore.toOptInt, oppScore.toOptInt, lineSplit(8).toOptDouble
+      lineSplit(0).toOptStr,
+      lineSplit(1).toOptStr,
+      lineSplit(2).toOptInt,
+      lineSplit(3).toOptStr,
+      lineSplit(4).toOptInt,
+      lineSplit(5).toOptInt,
+      lineSplit(6).toOptStr,
+      teamScore.toOptInt,
+      oppScore.toOptInt,
+      lineSplit(8).toOptDouble
     )
   }
 
@@ -95,7 +103,7 @@ object RushingDatum {
       map { (RushingDatum.apply _).tupled }.seq
   }
 
-  private def produceRushMetrics(rushingData: Seq[RushingDatum]): (Double, Int, Int) = {
+  private def produceRushMetricsByRange(rushingData: Seq[RushingDatum]): (Double, Int, Int) = {
     (
       rushingData.map(_.yardsRushed).sum / rushingData.size,
       rushingData.size,
@@ -103,11 +111,12 @@ object RushingDatum {
     )
   }
 
-  def findAverageRushByLocation(rushingData: Seq[RushingDatum]): Seq[AnalyzedRushRange] = {
+  def findAverageRushByLocation(numBuckets: Int)(rushingData: Seq[RushingDatum]): Seq[AnalyzedRushRange] = {
+    // FIXME: Yards to go is yds to go in down, not yards to go for td
     rushingData.
-      groupBy { _.yardsLeftBucket(20) }.
+      groupBy { _.yardsLeftBucket(numBuckets) }.
       collect { case (Some(yardsLeft), groupedData) => (yardsLeft, groupedData) }.
-      mapValues { produceRushMetrics }.toSeq.
+      mapValues { produceRushMetricsByRange }.toSeq.
       sortBy { case (yardsLeft, _) => yardsLeft }.
       map { case (yardsLeft, (avgRush, rushes, tds)) => AnalyzedRushRange(yardsLeft, avgRush, rushes, tds) }
   }

@@ -1,8 +1,7 @@
 package ra.analysis.rushing.data
 
 case class YardRange(start: Int, end: Int) {
-  def contains(yard: Int): Boolean = yard >= start && yard < end
-
+  def contains(yard: Int): Boolean = yard >= start && yard <= end
   def rangeString: String = s"$start-$end"
 }
 

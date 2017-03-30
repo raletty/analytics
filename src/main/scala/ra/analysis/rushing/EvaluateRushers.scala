@@ -8,7 +8,7 @@ object EvaluateRushers {
 
   def main(args: Array[String]) = {
 
-    val rushingData: Seq[String] = getData("/ra/analysis/rushing/21st_century_rushers")
+    val rushingData: Seq[String] = getData("/ra/analysis/rushing/top_25_rushers_2016")
 
     /**
      * Player,Team,Quarter,Time Left,Down,Yards To Go,Location,Score,Yards Rushed
@@ -17,24 +17,29 @@ object EvaluateRushers {
      **/
 
     val parsedData: Seq[RushingDatum] = RushingDatum.parseData(rushingData.drop(1))
+    val numRushers: Int               = parsedData.map(_.playerName).distinct.size
+    val yardageBuckets: Int           = 10
 
-    val averageRushRanges: Seq[AnalyzedRushRange] = RushingDatum.findAverageRushByLocation(parsedData)
+    val averageRushRanges: Seq[AnalyzedRushRange] =
+      RushingDatum.findAverageRushByLocation(yardageBuckets)(parsedData)
 
     val playerRushByLocation: Map[String, Seq[AnalyzedRushRange]] =
       parsedData.
         groupBy { _.playerName }.
-        mapValues { RushingDatum.findAverageRushByLocation }
+        mapValues { RushingDatum.findAverageRushByLocation(yardageBuckets) }
 
     val normalizedPlayerRanges: Seq[(String, Seq[NormalizedRushRange])] =
       playerRushByLocation.
         map { case (playerName, playerRushRanges) =>
-          val toNormalizedRushRange = (AnalyzedRushRange.produceComparisonToAverage(32, 1.0) _).tupled
+          val toNormalizedRushRange = (AnalyzedRushRange.produceComparisonToAverage(numRushers, 1.0) _).tupled
           val normalizedRanges = (playerRushRanges zip averageRushRanges).map { toNormalizedRushRange }
           (playerName, normalizedRanges)
         } (breakOut)
 
+    println("Normalized Ranges: ")
     formatScores(normalizedPlayerRanges).foreach(println)
-    // formatScores(playerRushByLocation.toSeq).foreach(println)
+    println("Pure Ranges: ")
+    formatScores(playerRushByLocation.toSeq).foreach(println)
 
     // TODO: Output JS usable metric/percentage values. Build TD graphic as a wrapper around yardage graphic (for signature)?
 
