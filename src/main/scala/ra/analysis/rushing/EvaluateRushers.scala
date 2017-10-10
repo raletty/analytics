@@ -8,7 +8,8 @@ object EvaluateRushers {
 
   def main(args: Array[String]) = {
 
-    val rushingData: Seq[String] = getData("/ra/analysis/rushing/top_25_rushers_2016")
+    val rushingData: Seq[String] = getData("/ra/analysis/rushing/21st_century_rushers")
+    // val rushingData: Seq[String] = getData("/ra/analysis/rushing/top_25_rushers_2016")
 
     /**
      * Player,Team,Quarter,Time Left,Down,Yards To Go,Location,Score,Yards Rushed
@@ -18,7 +19,7 @@ object EvaluateRushers {
 
     val parsedData: Seq[RushingDatum] = RushingDatum.parseData(rushingData.drop(1))
     val numRushers: Int               = parsedData.map(_.playerName).distinct.size
-    val yardageBuckets: Int           = 10
+    val yardageBuckets: Int           = 20
 
     val averageRushRanges: Seq[AnalyzedRushRange] =
       RushingDatum.findAverageRushByLocation(yardageBuckets)(parsedData)
@@ -40,9 +41,6 @@ object EvaluateRushers {
     formatScores(normalizedPlayerRanges).foreach(println)
     println("Pure Ranges: ")
     formatScores(playerRushByLocation.toSeq).foreach(println)
-
-    // TODO: Output JS usable metric/percentage values. Build TD graphic as a wrapper around yardage graphic (for signature)?
-
   }
 
   def formatScores(normalizedPlayerRanges: Seq[(String, Seq[RushRange])]): Seq[String] = {

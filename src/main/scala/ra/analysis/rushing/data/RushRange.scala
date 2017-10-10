@@ -9,20 +9,22 @@ case class AnalyzedRushRange(
   range: YardRange,
   averageRush: Double,
   numRushes: Int,
-  numTouchdowns: Int
+  numTds: Int
 ) extends RushRange {
   override def toString: String = s"{" +
     s"range: ${range.rangeString}" +
     s", averageRush: $averageRush" +
     s", rushes: $numRushes" +
-    s", touchdowns: $numTouchdowns" +
+    s", touchdowns: $numTds" +
     s"}"
-  def csvString: String = s"${range.rangeString},$averageRush,$numRushes,$numTouchdowns"
+  def csvString: String = s"${range.rangeString},$averageRush,$numRushes,$numTds"
 }
 
 case class NormalizedRushRange(
   range: YardRange,
   numRushes: Int,
+  avgRush: Double,
+  numTds: Int,
   normalizedAvgRush: Double,
   normalizedNumRushes: Double,
   normalizedTdRate: Double,
@@ -35,7 +37,7 @@ case class NormalizedRushRange(
     s", nTouchdownRate: $normalizedTdRate" +
     s", nTouchdowns: $normalizedNumTds" +
     s"}"
-  def csvString: String = s"${range.rangeString},$numRushes,$normalizedAvgRush,$normalizedNumRushes,$normalizedTdRate,$normalizedNumTds"
+  def csvString: String = s"${range.rangeString},$numRushes,$avgRush,$numTds,$normalizedAvgRush,$normalizedNumRushes,$normalizedTdRate,$normalizedNumTds"
 }
 
 object AnalyzedRushRange {
@@ -60,20 +62,22 @@ object AnalyzedRushRange {
     require(playerRange.range == averageRange.range)
 
     val avgAverageRush = averageRange.averageRush
-    val avgTouchdownRate = averageRange.numTouchdowns.toDouble / averageRange.numRushes
+    val avgTouchdownRate = averageRange.numTds.toDouble / averageRange.numRushes
 
     val avgNumRushes = averageRange.numRushes.toDouble / numPlayers
-    val avgNumTouchdowns = averageRange.numTouchdowns.toDouble / numPlayers
+    val avgNumTouchdowns = averageRange.numTds.toDouble / numPlayers
 
     val playerAverageRush = playerRange.averageRush
-    val playerTouchdownRate = playerRange.numTouchdowns.toDouble / playerRange.numRushes
+    val playerTouchdownRate = playerRange.numTds.toDouble / playerRange.numRushes
 
     val playerNumRushes = playerRange.numRushes.toDouble
-    val playerNumTouchdowns = playerRange.numTouchdowns.toDouble
+    val playerNumTouchdowns = playerRange.numTds.toDouble
 
     NormalizedRushRange(
       playerRange.range,
       playerRange.numRushes,
+      playerRange.averageRush,
+      playerRange.numTds,
       normalizeMetricToAverage(playerAverageRush, avgAverageRush, offset),
       normalizeMetricToAverage(playerNumRushes, avgNumRushes, offset),
       normalizeMetricToAverage(playerTouchdownRate, avgTouchdownRate, offset),
