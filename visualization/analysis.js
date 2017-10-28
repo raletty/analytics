@@ -4,24 +4,30 @@ var players;
 var yardRows;
 var tdRows;
 var showYards = true;
+// var filename = 'playerRushes5yds.csv';
+var filename = 'playerRushes2yds.csv';
 
-d3.csv('normalizedPlayerRushes.csv', function(data) {
+d3.csv(filename, function(data) {
   players = _u.uniq(data.map(function(d) { return d['Player']; }));
 
   yardRows = data.map(function(d) {
     var player = d['Player'];
     var range = d['Range'];
-    var avgRush = +d['Normalized Average Rush'];
-    var numRushes = +d['Normalized Num Rushes'];
-    return { 'player': player, 'range': range, 'avgRush': avgRush, 'numRushes': numRushes };
+    var numRushes = +d['Num Rushes'];
+    var avgRush = +d['Average Rush'];
+    var nAvgRush = +d['Normalized Average Rush'];
+    var nNumRushes = +d['Normalized Num Rushes'];
+    return { 'player': player, 'range': range, 'avgRush': avgRush, 'numRushes': numRushes, 'nAvgRush': nAvgRush, 'nNumRushes': nNumRushes };
   });
 
   tdRows = data.map(function(d) {
     var player = d['Player'];
     var range = d['Range'];
-    var tdRate = +d['Normalized TD Rate'];
-    var numTds = +d['Normalized Num TDs'];
-    return { 'player': player, 'range': range, 'tdRate': tdRate, 'numTds': numTds };
+    var numRushes = +d['Num Rushes'];
+    var numTds = +d['Num TDs'];
+    var nTdRate = +d['Normalized TD Rate'];
+    var nNumTds = +d['Normalized Num TDs'];
+    return { 'player': player, 'range': range, 'numRushes': numRushes, 'numTds': numTds, 'nTdRate': nTdRate, 'nNumTds': nNumTds };
   });
 
   displayPlayersList(players);
@@ -38,8 +44,7 @@ var loadPlayerSignature = function() {
 
 var yards_csv = function() {
 
-  d3.csv('normalizedPlayerRushes.csv', function(data) {
-    console.log('playerData: ', data[0]);
+  d3.csv(filename, function(data) {
     var playerStats = data.map(function(d) {
       var player = d['Player'];
       var range = d['Range'];
@@ -52,7 +57,6 @@ var yards_csv = function() {
         'numRushes': numRushes
       };
     });
-    console.log('playerData: ', playerStats[0]);
     signatures(playerStats);
   });
 

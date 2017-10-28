@@ -1,26 +1,82 @@
 'use script';
 
-var w = 900;
-var h = 300;
+var svg;
+var svgWidth = 800;
+var svgHeight = 400;
+
+// TODO: Make minWidth 0?
+var minWidth = 1;
+var maxWidth = svgHeight / 4;
 
 function displayPlayerSignature(playerData) {
-  console.log("playerData: ", playerData);
+  svg.selectAll("*").remove();
 
-  var sigDistance = d3.scaleLinear()
-    .domain([0, 100])
-    .range([0, w]);
+  var data = _u.flatMap(playerData, function(playerDatum) {
+    var rangeSplit = playerDatum.range.split('-');
+    return _u.
+      range(parseInt(rangeSplit[0]), parseInt(rangeSplit[1]) + 1).
+      map(function(i) {
+        return {
+          x: i,
+          y: playerDatum.avgRush,
+          w: playerDatum.numRushes,
+          c: playerDatum.nAvgRush
+        };
+      });
+  });
 
-  var sigHeight = d3.scaleLinear()
-    .domain([0, 2])
-    .range([h, 0]);
+  var gArea = svg.append("g").attr("class", "area-group");
+  gArea.append("path")
+    .datum(data)
+    .attr("class", "area area-above")
+    .attr("d", areaAbove)
+    .style("fill", "url(#area-gradient)");
 
-  var minWidth = 1;
-  var maxWidth = height / 5;
-  var sigWidth = d3.scaleLinear()
-    .domain([0, 2])
-    .range([minWidth, maxWidth]);
+  gArea.append("path")
+    .datum(data)
+    .attr("class", "area area-below")
+    .attr("d", areaBelow)
+    .style("fill", "url(#area-gradient)");
 
+  // var line = d3.line()
+  //   .x(function(d) { return sigDistance(d.x); })
+  //   .y(function(d) { return sigHeight(d.y); })
+  //   .curve(d3.curveBasis);
+  //
+  // gArea.append("path")
+  //   .datum(data)
+  //   .attr("d", line)
+  //   .style("stroke", "#000")
+  //   .style("fill", "none")
 
+  var colorData = [];
+  var stripe = false; // set stripe to true to prevent linear gradient fading
+  for (var i = 0; i < data.length; i++) {
+    var prevData = data[i - 1];
+    var currData = data[i];
+    if (stripe && prevData) {
+      colorData.push({
+        offset: currData.x + "%",
+        stopColor: colorScale(prevData.c)
+      });
+    }
+    colorData.push({
+      offset: currData.x + "%",
+      stopColor: colorScale(currData.c)
+    });
+  }
+
+  // generate the linear gradient used by the signature
+  gArea.append("linearGradient")
+    .attr("id", "area-gradient")
+    .attr("gradientUnits", "userSpaceOnUse")
+    .attr("y1", 0)
+    .attr("y2", 0)
+    .selectAll("stop")
+      .data(colorData)
+      .enter().append("stop")
+        .attr("offset", function(d) { return d.offset })
+        .attr("stop-color", function (d) { return d.stopColor; });
 
 }
 
@@ -37,23 +93,9 @@ function displayPlayersList(players) {
 
 function init() {
   // setup the svg
-  var svg = d3.select("#signature").append("svg")
-    .attr("width", width)
-    .attr("height", height);
+  svg = d3.select("#signature").append("svg")
+    .attr("width", svgWidth)
+    .attr("height", svgHeight);
 
   console.log("svg", svg);
-
-  // var svg = d3.select("#svg")
-  //   .attr("width", w + 100)
-  //   .attr("height", h + 100);
-
-  // svg.append("svg:rect")
-  //   .attr("width", "100%")
-  //   .attr("height", "100%")
-  //   .attr("stroke", "#000")
-  //   .attr("fill", "none");
-  //
-  // svg.append("svg:g")
-  //   .attr("id", "barchart")
-  //   .attr("transform", "translate(50,50)");
 }
