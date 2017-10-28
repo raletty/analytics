@@ -6,47 +6,46 @@ import scala.collection.breakOut
 
 object EvaluateRushers {
 
-  def main(args: Array[String]) = {
+  def main( args: Array[String] ) = {
 
-    val rushingData: Seq[String] = getData("/ra/analysis/rushing/21st_century_rushers")
+    val rushingData: Seq[String] = getData( "/ra/analysis/rushing/21st_century_rushers" )
     // val rushingData: Seq[String] = getData( "/ra/analysis/rushing/top_25_rushers_2016" )
 
-    /**
-     * Player,Team,Quarter,Time Left,Down,Yards To Go,Location,Score,Yards Rushed
-     * Shaun Alexander,SEA,3,2:06,4,1,SEA 44,10-21,50
-     * Edgerrin James,ARI,2,13:07,1,10,CRD 12,0-0,18
+    /** Player,Team,Quarter,Time Left,Down,Yards To Go,Location,Score,Yards Rushed
+     *  Shaun Alexander,SEA,3,2:06,4,1,SEA 44,10-21,50
+     *  Edgerrin James,ARI,2,13:07,1,10,CRD 12,0-0,18
      */
 
-    val parsedData: Seq[RushingDatum] = RushingDatum.parseData(rushingData.drop(1))
-    val numRushers: Int = parsedData.map(_.playerName).distinct.size
+    val parsedData: Seq[RushingDatum] = RushingDatum.parseData( rushingData.drop( 1 ) )
+    val numRushers: Int = parsedData.map( _.playerName ).distinct.size
     val yardageBuckets: Int = 50
 
     val averageRushRanges: Seq[AnalyzedRushRange] =
-      RushingDatum.findAverageRushByLocation(yardageBuckets)(parsedData)
+      RushingDatum.findAverageRushByLocation( yardageBuckets )( parsedData )
 
     val playerRushByLocation: Map[String, Seq[AnalyzedRushRange]] =
       parsedData.
         groupBy { _.playerName }.
-        mapValues { RushingDatum.findAverageRushByLocation(yardageBuckets) }
+        mapValues { RushingDatum.findAverageRushByLocation( yardageBuckets ) }
 
-    val normalizedPlayerRanges: Seq[(String, Seq[NormalizedRushRange])] =
+    val normalizedPlayerRanges: Seq[( String, Seq[NormalizedRushRange] )] =
       playerRushByLocation.
         map {
-          case (playerName, playerRushRanges) =>
-            val toNormalizedRushRange = (AnalyzedRushRange.produceComparisonToAverage(numRushers, 1.0) _).tupled
-            val normalizedRanges = (playerRushRanges zip averageRushRanges).map { toNormalizedRushRange }
-            (playerName, normalizedRanges)
-        }(breakOut)
+          case ( playerName, playerRushRanges ) =>
+            val toNormalizedRushRange = ( AnalyzedRushRange.produceComparisonToAverage( numRushers, 1.0 ) _ ).tupled
+            val normalizedRanges = ( playerRushRanges zip averageRushRanges ).map { toNormalizedRushRange }
+            ( playerName, normalizedRanges )
+        }( breakOut )
 
-    println("Normalized Ranges: ")
-    formatScores(normalizedPlayerRanges).foreach(println)
+    println( "Normalized Ranges: " )
+    formatScores( normalizedPlayerRanges ).foreach( println )
     //    println("Pure Ranges: ")
     //    formatScores(playerRushByLocation.toSeq).foreach(println)
   }
 
-  def formatScores(normalizedPlayerRanges: Seq[(String, Seq[RushRange])]): Seq[String] = {
+  def formatScores( normalizedPlayerRanges: Seq[( String, Seq[RushRange] )] ): Seq[String] = {
     for {
-      (name, ranges) <- normalizedPlayerRanges
+      ( name, ranges ) <- normalizedPlayerRanges
       range <- ranges
     } yield s"$name,${range.csvString}"
   }

@@ -15,10 +15,10 @@ class NbaGradientBuilder extends GradientBuilder[NBA] {
 
   val diffDifference: Double = 0.04
 
-  def evaluateGameWeight(week: Int, away: Boolean, differential: Int): Double = {
-    val weekWeight = 1 - (numWeeks - week) * gameDifference
-    val awayWeight = if (away) 1.0 else isHome
-    val differentialWeight = 1 - subDifferential(differential)
+  def evaluateGameWeight( week: Int, away: Boolean, differential: Int ): Double = {
+    val weekWeight = 1 - ( numWeeks - week ) * gameDifference
+    val awayWeight = if ( away ) 1.0 else isHome
+    val differentialWeight = 1 - subDifferential( differential )
     weekWeight * awayWeight * differentialWeight
   }
 }

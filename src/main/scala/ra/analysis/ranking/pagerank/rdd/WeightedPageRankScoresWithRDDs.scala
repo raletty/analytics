@@ -11,7 +11,7 @@ object WeightedPageRankScoresWithRDDs {
 
   def runWeightedPageRankWithRDDs[A <: Sport: GameOps](
     resetProb: Double,
-    numIters: Int
+    numIters:  Int
   ): ScoreMap = {
 
     val gameOps = implicitly[GameOps[A]]
@@ -20,31 +20,31 @@ object WeightedPageRankScoresWithRDDs {
 
     val sc = new SparkContext(
       new SparkConf()
-        .setMaster("local[*]")
-        .setAppName("WeightedPageRankScoresWithRDDs")
+        .setMaster( "local[*]" )
+        .setAppName( "WeightedPageRankScoresWithRDDs" )
     )
 
-    val vidToTeamName = teams.map(team => (vertexIdFromName(team), team))
-    val teamNamesRDD = VertexRDD[String](sc.parallelize(vidToTeamName))
+    val vidToTeamName = teams.map( team => ( vertexIdFromName( team ), team ) )
+    val teamNamesRDD = VertexRDD[String]( sc.parallelize( vidToTeamName ) )
 
     val gameDescriptions: Seq[Describable[A]] = gameLines.
-      map(gameOps.generateGameDescription).
-      collect { case Some(desc) => desc }
+      map( gameOps.generateGameDescription ).
+      collect { case Some( desc ) => desc }
 
     val teamGradients: TeamGradient = gameDescriptions.
-      groupBy(_.loser).
-      mapValues { buildTeamGradientEntry[A](gameOps.gradientBuilder) }.
-      map(identity)
+      groupBy( _.loser ).
+      mapValues { buildTeamGradientEntry[A]( gameOps.gradientBuilder ) }.
+      map( identity )
 
-    val gameEdgeRDD = sc.parallelize(gameDescriptions.map(generateWeightedGameEdge))
-    val gameGraph = Graph.fromEdges(gameEdgeRDD, 1.0)
+    val gameEdgeRDD = sc.parallelize( gameDescriptions.map( generateWeightedGameEdge ) )
+    val gameGraph = Graph.fromEdges( gameEdgeRDD, 1.0 )
 
-    val teamGradientBroadcast: Broadcast[TeamGradient] = sc.broadcast(teamGradients)
+    val teamGradientBroadcast: Broadcast[TeamGradient] = sc.broadcast( teamGradients )
     val weightedIterationOutput = generateIterationScoresMap[GameEdgeAttribute, GameEdgeAttribute](
-      inputGraph = gameGraph,
-      runIterations = EdgeWeightedPageRank.run[Double](teamGradientBroadcast, 0.4),
-      teamNamesRDD = teamNamesRDD,
-      iterations = 12
+      inputGraph    = gameGraph,
+      runIterations = EdgeWeightedPageRank.run[Double]( teamGradientBroadcast, 0.4 ),
+      teamNamesRDD  = teamNamesRDD,
+      iterations    = 12
     )
 
     weightedIterationOutput

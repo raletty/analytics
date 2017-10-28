@@ -24,7 +24,7 @@ lazy val cats               = "org.typelevel" %% "cats" % catsVersion withSource
 
 lazy val root = (project in file(".")).
   settings(commonSettings: _*).
-
+  settings(commonScalariformSettings: _*).
   settings(
     name := "Sports Analysis",
     resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",

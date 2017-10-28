@@ -8,7 +8,7 @@ import ra.analysis.ranking.pagerank.models.{ GameOps, Sport, ScoreMap }
 object PageRankScoresWithFrames {
 
   def runPageRankWithFrames[A <: Sport: GameOps](
-    resetProb: Double,
+    resetProb:  Double,
     iterations: Int
   ): ScoreMap = {
 
@@ -17,26 +17,26 @@ object PageRankScoresWithFrames {
     val teams = gameOps.teams
 
     val spark = SparkSession.builder()
-      .master("local[*]")
-      .appName("PageRankScoresWithFrames")
+      .master( "local[*]" )
+      .appName( "PageRankScoresWithFrames" )
       .getOrCreate()
 
     import spark.implicits._
 
-    val teamNamesFrame = teams.map(TeamName.apply).toDF()
+    val teamNamesFrame = teams.map( TeamName.apply ).toDF()
     val gameOutcomesFrame = gameLines.
-      map(gameOps.generateGameDescription).
-      collect { case Some(desc) => desc }.
-      map { desc => (desc.loser, desc.winner) }.
-      map(GameOutcome.tupled).toDF("src", "dst")
-    val inputGraphFrame = GraphFrame(teamNamesFrame, gameOutcomesFrame)
+      map( gameOps.generateGameDescription ).
+      collect { case Some( desc ) => desc }.
+      map { desc => ( desc.loser, desc.winner ) }.
+      map( GameOutcome.tupled ).toDF( "src", "dst" )
+    val inputGraphFrame = GraphFrame( teamNamesFrame, gameOutcomesFrame )
 
     val iterationScoresOutput = generateIterationScoresMapFromFrame(
       spark,
-      inputFrame = inputGraphFrame,
+      inputFrame     = inputGraphFrame,
       teamNamesFrame = teamNamesFrame,
-      resetProb = resetProb,
-      iters = iterations
+      resetProb      = resetProb,
+      iters          = iterations
     )
 
     iterationScoresOutput
