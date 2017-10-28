@@ -14,11 +14,11 @@ trait GradientBuilder[A <: Sport] {
   def evaluateGameWeight(week: Int, away: Boolean, differential: Int): Double
 
   /**
-    * A basic tiering on point differential -- lower differential = more penalty.
-    *
-    * @param differential --
-    * @return             -- penalty to remove on edge weight
-    */
+   * A basic tiering on point differential -- lower differential = more penalty.
+   *
+   * @param differential --
+   * @return             -- penalty to remove on edge weight
+   */
   def subDifferential(differential: Int): Double = {
     val diffTier = roundToN(tierInterval)(differential) / tierInterval
     if (diffTier >= tierCutoff) 0.0 else (tierCutoff - diffTier) * diffDifference

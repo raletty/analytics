@@ -11,11 +11,11 @@ trait PageRankUtils {
     val split = gameLine.split(",")
     Some(
       NflGameDescription(
-        loser       = vertexIdFromName(split(6)),
-        winner      = vertexIdFromName(split(4)),
-        gameNumber  = split(0).toInt,
-        away        = split(5).nonEmpty,
-        scoreDiff   = split(7).toInt - split(8).toInt
+        loser = vertexIdFromName(split(6)),
+        winner = vertexIdFromName(split(4)),
+        gameNumber = split(0).toInt,
+        away = split(5).nonEmpty,
+        scoreDiff = split(7).toInt - split(8).toInt
       )
     )
   }
@@ -24,12 +24,12 @@ trait PageRankUtils {
     val split = gameLine.split(",")
 
     NbaGameDescription(
-      loser       = vertexIdFromName(split(4)),
-      winner      = vertexIdFromName(split(0)),
-      date        = split(2),
-      gameNumber  = split(1).toInt,
-      away        = split(3).nonEmpty,
-      scoreDiff   = split(6).toInt - split(7).toInt
+      loser = vertexIdFromName(split(4)),
+      winner = vertexIdFromName(split(0)),
+      date = split(2),
+      gameNumber = split(1).toInt,
+      away = split(3).nonEmpty,
+      scoreDiff = split(6).toInt - split(7).toInt
     ).optionOn(split(5) == "W")
   }
 

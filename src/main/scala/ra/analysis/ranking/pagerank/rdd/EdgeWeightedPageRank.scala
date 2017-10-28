@@ -1,7 +1,7 @@
 package ra.analysis.ranking.pagerank.rdd
 
 import org.apache.spark.broadcast.Broadcast
-import org.apache.spark.graphx.{VertexRDD, Graph, TripletFields}
+import org.apache.spark.graphx.{ VertexRDD, Graph, TripletFields }
 import ra.analysis.ranking.pagerank.models._
 
 import scala.reflect.ClassTag
@@ -9,19 +9,19 @@ import scala.reflect.ClassTag
 object EdgeWeightedPageRank {
 
   /**
-    * Runs a weighted version of PageRank applying the following changes:
-    * -- runs a gradient across the season weighting recent games higher
-    * -- takes into account away wins as being more impressive
-    * -- uses strength of victory in a game as another modification on rank
-    *
-    * GameEdgeAttribute => (week, away, score difference)
-    *
-    * @param inputGraph     -- input graph where each edge has a GameEdgeAttribute
-    * @param gameGradient   -- a mapping of week numbers to score weights
-    * @param startingWeight -- reset probability on a given vertex
-    * @tparam VD -- unused vertex attribute
-    * @return -- PageRank graph
-    */
+   * Runs a weighted version of PageRank applying the following changes:
+   * -- runs a gradient across the season weighting recent games higher
+   * -- takes into account away wins as being more impressive
+   * -- uses strength of victory in a game as another modification on rank
+   *
+   * GameEdgeAttribute => (week, away, score difference)
+   *
+   * @param inputGraph     -- input graph where each edge has a GameEdgeAttribute
+   * @param gameGradient   -- a mapping of week numbers to score weights
+   * @param startingWeight -- reset probability on a given vertex
+   * @tparam VD -- unused vertex attribute
+   * @return -- PageRank graph
+   */
   def run[VD: ClassTag](
     gameGradient: Broadcast[TeamGradient],
     startingWeight: Double = 0.15

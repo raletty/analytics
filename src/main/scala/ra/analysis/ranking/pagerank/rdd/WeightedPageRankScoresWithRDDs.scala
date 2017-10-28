@@ -1,22 +1,22 @@
 package ra.analysis.ranking.pagerank.rdd
 
 import org.apache.spark.broadcast.Broadcast
-import org.apache.spark.graphx.{Graph, VertexRDD}
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.graphx.{ Graph, VertexRDD }
+import org.apache.spark.{ SparkConf, SparkContext }
 import ra.analysis.ranking.pagerank.models
 import models._
 import ra.analysis.ranking.pagerank.rdd.PageRankRDDUtils._
 
 object WeightedPageRankScoresWithRDDs {
 
-  def runWeightedPageRankWithRDDs[A <: Sport : GameOps](
+  def runWeightedPageRankWithRDDs[A <: Sport: GameOps](
     resetProb: Double,
     numIters: Int
   ): ScoreMap = {
 
-    val gameOps   = implicitly[GameOps[A]]
+    val gameOps = implicitly[GameOps[A]]
     val gameLines = gameOps.gameLines.tail
-    val teams     = gameOps.teams
+    val teams = gameOps.teams
 
     val sc = new SparkContext(
       new SparkConf()
@@ -41,10 +41,10 @@ object WeightedPageRankScoresWithRDDs {
 
     val teamGradientBroadcast: Broadcast[TeamGradient] = sc.broadcast(teamGradients)
     val weightedIterationOutput = generateIterationScoresMap[GameEdgeAttribute, GameEdgeAttribute](
-      inputGraph    = gameGraph,
+      inputGraph = gameGraph,
       runIterations = EdgeWeightedPageRank.run[Double](teamGradientBroadcast, 0.4),
-      teamNamesRDD  = teamNamesRDD,
-      iterations    = 12
+      teamNamesRDD = teamNamesRDD,
+      iterations = 12
     )
 
     weightedIterationOutput

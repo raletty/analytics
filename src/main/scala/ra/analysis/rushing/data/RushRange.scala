@@ -6,10 +6,10 @@ trait RushRange {
 }
 
 case class AnalyzedRushRange(
-  range: YardRange,
-  averageRush: Double,
-  numRushes: Int,
-  numTds: Int
+    range: YardRange,
+    averageRush: Double,
+    numRushes: Int,
+    numTds: Int
 ) extends RushRange {
   override def toString: String = s"{" +
     s"range: ${range.rangeString}" +
@@ -21,14 +21,14 @@ case class AnalyzedRushRange(
 }
 
 case class NormalizedRushRange(
-  range: YardRange,
-  numRushes: Int,
-  avgRush: Double,
-  numTds: Int,
-  normalizedAvgRush: Double,
-  normalizedNumRushes: Double,
-  normalizedTdRate: Double,
-  normalizedNumTds: Double
+    range: YardRange,
+    numRushes: Int,
+    avgRush: Double,
+    numTds: Int,
+    normalizedAvgRush: Double,
+    normalizedNumRushes: Double,
+    normalizedTdRate: Double,
+    normalizedNumTds: Double
 ) extends RushRange {
   override def toString: String = s"{" +
     s"range: ${range.rangeString}" +

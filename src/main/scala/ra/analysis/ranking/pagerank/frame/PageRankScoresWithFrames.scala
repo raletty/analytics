@@ -3,18 +3,18 @@ package ra.analysis.ranking.pagerank.frame
 import org.apache.spark.sql.SparkSession
 import org.graphframes.GraphFrame
 import ra.analysis.ranking.pagerank.frame.PageRankFrameUtils._
-import ra.analysis.ranking.pagerank.models.{GameOps, Sport, ScoreMap}
+import ra.analysis.ranking.pagerank.models.{ GameOps, Sport, ScoreMap }
 
 object PageRankScoresWithFrames {
 
-  def runPageRankWithFrames[A <: Sport : GameOps](
+  def runPageRankWithFrames[A <: Sport: GameOps](
     resetProb: Double,
     iterations: Int
   ): ScoreMap = {
 
-    val gameOps   = implicitly[GameOps[A]]
+    val gameOps = implicitly[GameOps[A]]
     val gameLines = gameOps.gameLines
-    val teams     = gameOps.teams
+    val teams = gameOps.teams
 
     val spark = SparkSession.builder()
       .master("local[*]")

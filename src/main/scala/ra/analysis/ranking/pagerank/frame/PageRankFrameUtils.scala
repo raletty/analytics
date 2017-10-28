@@ -1,7 +1,7 @@
 package ra.analysis.ranking.pagerank.frame
 
 import org.apache.spark.graphx.VertexId
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{ DataFrame, SparkSession }
 import org.graphframes.GraphFrame
 import ra.analysis.ranking.pagerank.models.ScoreMap
 import ra.analysis.ranking.pagerank.PageRankUtils
@@ -16,14 +16,14 @@ object PageRankFrameUtils extends PageRankUtils {
   }
 
   /**
-    * Calculate the page rank scores for each vertex on each iteration.
-    *
-    * @param inputFrame -- input win-loss graph
-    * @param teamNamesFrame -- mapping of vertex ID to team name
-    * @param resetProb -- starting score on each vertex (non-personalized)
-    * @param iters -- number of iterations run
-    * @return a map pointing a team to a list of iteration scores
-    */
+   * Calculate the page rank scores for each vertex on each iteration.
+   *
+   * @param inputFrame -- input win-loss graph
+   * @param teamNamesFrame -- mapping of vertex ID to team name
+   * @param resetProb -- starting score on each vertex (non-personalized)
+   * @param iters -- number of iterations run
+   * @return a map pointing a team to a list of iteration scores
+   */
   def generateIterationScoresMapFromFrame(
     spark: SparkSession,
     inputFrame: GraphFrame,
@@ -57,6 +57,5 @@ object PageRankFrameUtils extends PageRankUtils {
 
     iterationScoresMap
   }
-
 
 }

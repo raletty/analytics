@@ -10,12 +10,12 @@ object WinDifferenceDistribution {
    * @param input -- input number to round
    * @param digits -- number of significant digits to round to
    */
-  def round(input: Double, digits: Int) : Double = {
+  def round(input: Double, digits: Int): Double = {
     val df = new DecimalFormat("###." + ("0" * digits))
     df.format(input).toDouble
   }
 
-  def roundToQuantile(input: Double, quantile: Int) : Double = {
+  def roundToQuantile(input: Double, quantile: Int): Double = {
     math.round(input * quantile) / quantile.toDouble
   }
 
@@ -23,7 +23,7 @@ object WinDifferenceDistribution {
    * Computes the average of a sequence of doubles.
    * @param input -- input sequence of doubles
    */
-  def average(input: Seq[Double]) : Double = {
+  def average(input: Seq[Double]): Double = {
     input.foldLeft(0.0)(_ + _) / input.foldLeft(0.0)((r, c) => r + 1)
   }
 
@@ -50,11 +50,13 @@ object WinDifferenceDistribution {
     // For each team, zip the team's win history with a 1-year translation of
     // itself. Then construct a tuple with expectation difference and new win count.
     // Output: (wins this season, expectation difference last season)
-    val combinedWinDiffTuples = groupedWinDiffTuples.flatMap { case (team, years) =>
-      val zippedYears = years.drop(1) zip years
-      zippedYears.map { case ((_, _, newWin, _), (_, _, oldWin, oldExp)) =>
-        (newWin, round(oldExp - oldWin, 3))
-      }
+    val combinedWinDiffTuples = groupedWinDiffTuples.flatMap {
+      case (team, years) =>
+        val zippedYears = years.drop(1) zip years
+        zippedYears.map {
+          case ((_, _, newWin, _), (_, _, oldWin, oldExp)) =>
+            (newWin, round(oldExp - oldWin, 3))
+        }
     }
 
     // Group by new record and gather all expected differences. Average and round

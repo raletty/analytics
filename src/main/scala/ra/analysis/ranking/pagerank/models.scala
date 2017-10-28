@@ -1,7 +1,7 @@
 package ra.analysis.ranking.pagerank
 
 import org.apache.spark.graphx.VertexId
-import ra.analysis.ranking.pagerank.gradient.{NbaGradientBuilder, NflGradientBuilder, GradientBuilder}
+import ra.analysis.ranking.pagerank.gradient.{ NbaGradientBuilder, NflGradientBuilder, GradientBuilder }
 import ra.analysis.util.LoadUtils.getData
 
 object models {
@@ -19,7 +19,7 @@ object models {
 
   object Describable {
 
-    implicit class DescribableOps[A <: Sport]( describable: Describable[A] ) {
+    implicit class DescribableOps[A <: Sport](describable: Describable[A]) {
       def optionOn(condition: => Boolean): Option[Describable[A]] = if (condition) Some(describable) else None
     }
 

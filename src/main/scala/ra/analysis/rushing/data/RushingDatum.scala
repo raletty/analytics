@@ -6,16 +6,16 @@ import scala.collection.breakOut
 import scala.util.Try
 
 case class RushingDatum(
-  playerName: String,
-  team: String,
-  quarter: Int,
-  timeLeft: String,
-  down: Int,
-  yardsToGo: Int,
-  location: String,
-  teamScore: Int,
-  oppScore: Int,
-  yardsRushed: Double
+    playerName: String,
+    team: String,
+    quarter: Int,
+    timeLeft: String,
+    down: Int,
+    yardsToGo: Int,
+    location: String,
+    teamScore: Int,
+    oppScore: Int,
+    yardsRushed: Double
 ) {
 
   import RushingDatum._
@@ -52,7 +52,7 @@ object RushingDatum {
     def toOptDouble: Option[Double] = Try(stat.toDouble).toOption
   }
 
-  private final val fieldTickers = Seq (
+  private final val fieldTickers = Seq(
     "CRD", "ATL", "RAV", "BUF",
     "CAR", "CHI", "CIN", "CLE",
     "DAL", "DEN", "DET", "GNB",
@@ -63,7 +63,7 @@ object RushingDatum {
     "SEA", "TAM", "OTI", "WAS"
   )
 
-  private final val teamTickers = Seq (
+  private final val teamTickers = Seq(
     "ARI", "ATL", "BAL", "BUF",
     "CAR", "CHI", "CIN", "CLE",
     "DAL", "DEN", "DET", "GNB",

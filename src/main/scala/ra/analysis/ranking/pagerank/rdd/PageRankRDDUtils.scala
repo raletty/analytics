@@ -1,7 +1,7 @@
 package ra.analysis.ranking.pagerank.rdd
 
 import org.apache.spark.graphx.lib.PageRank
-import org.apache.spark.graphx.{VertexRDD, Graph}
+import org.apache.spark.graphx.{ VertexRDD, Graph }
 import org.apache.spark.rdd.RDD
 import ra.analysis.ranking.pagerank.models.ScoreMap
 import ra.analysis.ranking.pagerank.PageRankUtils
@@ -9,13 +9,13 @@ import ra.analysis.ranking.pagerank.PageRankUtils
 object PageRankRDDUtils extends PageRankUtils {
 
   /**
-    * Calculate the page rank scores for each vertex on each iteration.
-    *
-    * @param inputGraph -- input win-loss graph
-    * @param teamNamesRDD -- mapping of vertex ID to team name
-    * @param iterations -- number of iterations run
-    * @return a map pointing a team to a list of iteration scores
-    */
+   * Calculate the page rank scores for each vertex on each iteration.
+   *
+   * @param inputGraph -- input win-loss graph
+   * @param teamNamesRDD -- mapping of vertex ID to team name
+   * @param iterations -- number of iterations run
+   * @return a map pointing a team to a list of iteration scores
+   */
   def generateIterationScoresMap[ED1, ED2](
     inputGraph: Graph[Double, ED1],
     runIterations: (Graph[Double, ED1], Int) => Graph[Double, ED2],
@@ -45,14 +45,14 @@ object PageRankRDDUtils extends PageRankUtils {
   }
 
   /**
-    * An alternative to the above where iterations are run until the scores converge with some tolerance.
-    *
-    * @param inputGraph -- input win-loss graph
-    * @param teamNamesRDD -- mapping of vertex ID to team name
-    * @param tolerence -- epsilon within which final interation difference should lie
-    * @param resetProb -- starting score on each vertex (non-personalized)
-    * @return a map pointing a team to a list of iteration scores
-    */
+   * An alternative to the above where iterations are run until the scores converge with some tolerance.
+   *
+   * @param inputGraph -- input win-loss graph
+   * @param teamNamesRDD -- mapping of vertex ID to team name
+   * @param tolerence -- epsilon within which final interation difference should lie
+   * @param resetProb -- starting score on each vertex (non-personalized)
+   * @return a map pointing a team to a list of iteration scores
+   */
   def generateConvergenceRun(
     inputGraph: Graph[Double, Int],
     teamNamesRDD: VertexRDD[String],
