@@ -17,50 +17,67 @@ team_map = {
     "Ravens": "BAL", "Saints": "NOR", "Seahawks": "SEA", "Steelers": "PIT",
     "Texans": "HOU", "Titans": "TEN", "Vikings": "MIN", "49ers": "SFO"
 }
-year = 2016
+yearStart = 1994
+yearEnd = 2017
 
-players_template = "http://www.pro-football-reference.com/years/{year}/rushing.htm"
-games_template = "http://www.pro-football-reference.com/players/{player}/rushing-plays/{year}"
+for year in range(yearStart, yearEnd):
+    players_template = "http://www.pro-football-reference.com/years/{year}/rushing.htm"
+    games_template = "http://www.pro-football-reference.com/players/{player}/rushing-plays/{year}"
 
-players_url     = players_template.format(year=year)
-players_html    = urlopen(players_url)
-players_soup    = BeautifulSoup(players_html, "lxml")
+    players_url     = players_template.format(year=year)
+    players_html    = urlopen(players_url)
+    players_soup    = BeautifulSoup(players_html, "lxml")
 
-players_url_regex = re.compile(r'/players/(.*)\.htm', re.I)
+    players_url_regex = re.compile(r'/players/(.*)\.htm', re.I)
 
-rushers_soup = players_soup.find(text="Fmb").findAllNext('a', href=True)
-player_strings = [
-    re.search(players_url_regex, a['href']).group(1)
-    for a in rushers_soup if players_url_regex.match(a['href'])
-]
+    player_names_soup = players_soup.find(text="Fmb").findAllNext('a', href=True)
+    player_positions_soup = players_soup.find(text="Fmb").findAllNext('td', { "data-stat": "pos" })
 
-nfl_players = player_strings[:25]
+    player_names_strings = [
+        re.search(players_url_regex, a['href']).group(1)
+        for a in player_names_soup if players_url_regex.match(a['href'])
+    ]
 
-total_df = pd.DataFrame()
+    player_positions_strings = [
+        td.getText()
+        for td in player_positions_soup
+    ]
 
-for player in nfl_players:
-    games_url   = games_template.format(player=player, year=year)
-    games_html  = urlopen(games_url)
-    games_soup  = BeautifulSoup(games_html, "lxml")
+    nfl_players = [
+        x[0]
+        for x in zip(player_names_strings, player_positions_strings) if ('rb' in x[1].lower())
+    ][:50]
 
-    name = games_soup.find('title').getText().split(" 2016", 1)[0]
+    total_df = pd.DataFrame()
 
-    individual_plays = games_soup.find(text="Individual Plays Table").findAllNext('tr')
-    data_rows   = individual_plays[1:]
+    for player in nfl_players:
+        games_url        = games_template.format(player=player, year=year)
+        games_html       = urlopen(games_url)
+        games_soup       = BeautifulSoup(games_html, "lxml")
 
-    print "Appending %d rows for player %s" % (len(data_rows), name)
-    column_headers = [th.getText() for th in individual_plays[0].findAll('th')]
-    column_headers.pop(0)
+        name             = games_soup.find('title').getText().split(" %d" % year, 1)[0]
 
-    game_data = [[td.getText() for td in data_rows[i].findAll('td')] for i in range(len(data_rows))]
+        ind_plays_table  = games_soup.find(text="Individual Plays Table")
 
-    team_df = pd.DataFrame(game_data, columns=column_headers)
+        if ind_plays_table is None:
+            continue
 
-    delete_cols = [1, 8, 10, 11, 12]
-    team_df.drop(team_df.columns[delete_cols], axis=1, inplace=True)
-    team_df["Tm"].replace(team_map, inplace=True)
-    team_df.insert(0, "Name", name)
+        individual_plays = ind_plays_table.findAllNext('tr')
+        data_rows        = individual_plays[1:]
 
-    total_df = total_df.append(team_df, ignore_index=True)
+        print "Appending %d rows for player %s in year %d" % (len(data_rows), name, year)
+        column_headers   = [th.getText() for th in individual_plays[0].findAll('th')]
+        column_headers.pop(0)
 
-total_df.to_csv("top_25_rushers_2016", index=False)
+        game_data = [[td.getText() for td in data_rows[i].findAll('td')] for i in range(len(data_rows))]
+
+        team_df = pd.DataFrame(game_data, columns=column_headers)
+
+        delete_cols = [1, 8, 10, 11, 12]
+        team_df.drop(team_df.columns[delete_cols], axis=1, inplace=True)
+        team_df["Tm"].replace(team_map, inplace=True)
+        team_df.insert(0, "Name", name)
+
+        total_df = total_df.append(team_df, ignore_index=True)
+
+    total_df.to_csv("top_25_rushers_%d" % year, index=False)
