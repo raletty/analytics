@@ -1,5 +1,7 @@
 import sbt._
 import Keys._
+import scalariform.formatter.preferences._
+import com.typesafe.sbt.SbtScalariform.{ ScalariformKeys, defaultScalariformSettings }
 
 lazy val commonSettings = Seq(
   organization := "ra.analysis",
@@ -22,6 +24,7 @@ lazy val cats               = "org.typelevel" %% "cats" % catsVersion withSource
 
 lazy val root = (project in file(".")).
   settings(commonSettings: _*).
+
   settings(
     name := "Sports Analysis",
     resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
@@ -37,4 +40,18 @@ lazy val root = (project in file(".")).
     pollInterval := 1000,
     initialCommands in console := "import ra.analysis.distance._, ra.analysis.ranking.pagerank._, ra.analysis.distance._",
     fork := true
+  )
+
+lazy val commonScalariformSettings =
+  defaultScalariformSettings ++
+  addCommandAlias("format", ";test:scalariformFormat ;scalariformFormat") ++ (
+    ScalariformKeys.preferences := ScalariformKeys.preferences.value
+      .setPreference(AlignParameters, true)
+      .setPreference(AlignArguments, true)
+      .setPreference(AlignSingleLineCaseStatements, true)
+      .setPreference(MultilineScaladocCommentsStartOnFirstLine, true)
+      .setPreference(SpaceInsideParentheses, true)
+      .setPreference(SpacesWithinPatternBinders, true)
+      .setPreference(SpacesAroundMultiImports, true)
+      .setPreference(DoubleIndentClassDeclaration, false)
   )
