@@ -97,10 +97,10 @@ object RushingDatum {
 
   def parseData( records: Seq[String] ): Seq[RushingDatum] = {
     records.par.
-      map { splitLine }.
-      map { tupler10 }.
+      map( splitLine ).
+      map( tupler10 ).
       collect { case Some( a ) => a }.
-      map { ( RushingDatum.apply _ ).tupled }.seq
+      map( ( RushingDatum.apply _ ).tupled ).seq
   }
 
   private def produceRushMetricsByRange( rushingData: Seq[RushingDatum] ): ( Double, Int, Int ) = {
@@ -114,9 +114,9 @@ object RushingDatum {
   def findAverageRushByLocation( numBuckets: Int )( rushingData: Seq[RushingDatum] ): Seq[AnalyzedRushRange] = {
     // FIXME: Yards to go is yds to go in down, not yards to go for td
     rushingData.
-      groupBy { _.yardsLeftBucket( numBuckets ) }.
+      groupBy( _.yardsLeftBucket( numBuckets ) ).
       collect { case ( Some( yardsLeft ), groupedData ) => ( yardsLeft, groupedData ) }.
-      mapValues { produceRushMetricsByRange }.toSeq.
+      mapValues( produceRushMetricsByRange ).toSeq.
       sortBy { case ( yardsLeft, _ ) => yardsLeft }.
       map { case ( yardsLeft, ( avgRush, rushes, tds ) ) => AnalyzedRushRange( yardsLeft, avgRush, rushes, tds ) }
   }

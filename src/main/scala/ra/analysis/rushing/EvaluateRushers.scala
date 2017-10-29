@@ -25,8 +25,8 @@ object EvaluateRushers {
 
     val playerRushByLocation: Map[String, Seq[AnalyzedRushRange]] =
       parsedData.
-        groupBy { _.playerName }.
-        mapValues { RushingDatum.findAverageRushByLocation( yardageBuckets ) }
+        groupBy( _.playerName ).
+        mapValues( RushingDatum.findAverageRushByLocation( yardageBuckets ) )
 
     val normalizedPlayerRanges: Seq[( String, Seq[NormalizedRushRange] )] =
       playerRushByLocation.
@@ -35,7 +35,7 @@ object EvaluateRushers {
             val toNormalizedRushRange = ( AnalyzedRushRange.produceComparisonToAverage( numRushers, 1.0 ) _ ).tupled
             val normalizedRanges = ( playerRushRanges zip averageRushRanges ).map { toNormalizedRushRange }
             ( playerName, normalizedRanges )
-        }( breakOut )
+        } ( breakOut )
 
     println( "Normalized Ranges: " )
     formatScores( normalizedPlayerRanges ).foreach( println )
