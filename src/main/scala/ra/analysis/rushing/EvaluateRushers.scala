@@ -8,7 +8,8 @@ object EvaluateRushers {
 
   def main( args: Array[String] ) = {
 
-    val rushingData: Seq[String] = getData( "/ra/analysis/rushing/21st_century_rushers" )
+    val rushingData: Seq[String] = getData( "/ra/analysis/rushing/significant_rushing_plays_total_1994_2016" )
+    // val rushingData: Seq[String] = getData( "/ra/analysis/rushing/21st_century_rushers" )
     // val rushingData: Seq[String] = getData( "/ra/analysis/rushing/top_25_rushers_2016" )
 
     /** Player,Team,Quarter,Time Left,Down,Yards To Go,Location,Score,Yards Rushed
@@ -25,6 +26,7 @@ object EvaluateRushers {
 
     val playerRushByLocation: Map[String, Seq[AnalyzedRushRange]] =
       parsedData.
+        filter( data => PlayerGroups.historical.contains( data.playerName ) ).
         groupBy( _.playerName ).
         mapValues( RushingDatum.findAverageRushByLocation( yardageBuckets ) )
 
@@ -39,15 +41,35 @@ object EvaluateRushers {
 
     println( "Normalized Ranges: " )
     formatScores( normalizedPlayerRanges ).foreach( println )
-    //    println("Pure Ranges: ")
-    //    formatScores(playerRushByLocation.toSeq).foreach(println)
   }
 
   def formatScores( normalizedPlayerRanges: Seq[( String, Seq[RushRange] )] ): Seq[String] = {
     for {
-      ( name, ranges ) <- normalizedPlayerRanges
+      normalizedPlayerRange <- normalizedPlayerRanges
+      ( name, ranges ) = normalizedPlayerRange
       range <- ranges
     } yield s"$name,${range.csvString}"
   }
+
+}
+
+object PlayerGroups {
+
+  val historical = Seq(
+    "Shaun Alexander", "Tiki Barber", "Jerome Bettis", "Jamaal Charles",
+    "Corey Dillon", "Warrick Dunn", "Maurice Jones-Drew", "Marshall Faulk",
+    "Matt Forte", "Arian Foster", "Eddie George", "Frank Gore",
+    "Ahman Green", "Priest Holmes", "Steven Jackson", "Edgerrin James",
+    "Chris Johnson", "Jamal Lewis", "Marshawn Lynch", "Curtis Martin",
+    "DeMarco Murray", "LeSean McCoy", "Adrian Peterson", "Clinton Portis",
+    "Fred Taylor", "LaDainian Tomlinson", "Brian Westbrook", "Ricky Williams"
+  )
+
+  val recent = Seq(
+    "Cedric Benson", "Jamaal Charles", "Maurice Jones-Drew", "Matt Forte", "Arian Foster",
+    "Fred Jackson", "Chris Johnson", "Marshawn Lynch", "Doug Martin", "DeMarco Murray",
+    "LeSean McCoy", "Adrian Peterson", "Ray Rice", "Jonathan Stewart", "Michael Turner",
+    "DeAngelo Williams"
+  )
 
 }
