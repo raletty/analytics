@@ -9,10 +9,13 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.11.7"
 )
 
-lazy val sparkVersion       = "2.1.0" // "1.5.2"
+lazy val sparkVersion       = "2.1.0"
 lazy val scalazVersion      = "7.2.0"
 lazy val catsVersion        = "0.6.1"
 lazy val graphFramesVersion = "0.4.0-SNAPSHOT-spark2.1"
+
+lazy val scalacticVersion   = "3.0.4"
+lazy val scalatestVersion   = "3.0.4"
 
 lazy val sparkCore          = "org.apache.spark" %% "spark-core" % sparkVersion withSources() withJavadoc()
 lazy val sparkSQL           = "org.apache.spark" %% "spark-sql" % sparkVersion withSources() withJavadoc()
@@ -21,6 +24,9 @@ lazy val sparkGraphFrames   = "default" %% "graphframes" % graphFramesVersion wi
 
 lazy val scalaz             = "org.scalaz" %% "scalaz-core" % scalazVersion withSources() withJavadoc()
 lazy val cats               = "org.typelevel" %% "cats" % catsVersion withSources() withJavadoc()
+
+lazy val scalatest          = "org.scalatest" %% "scalatest" % scalatestVersion % "test"
+lazy val scalactic          = "org.scalactic" %% "scalactic" % scalacticVersion
 
 lazy val root = (project in file(".")).
   settings(commonSettings: _*).
@@ -33,6 +39,8 @@ lazy val root = (project in file(".")).
     libraryDependencies += sparkGraphX,
     libraryDependencies += sparkGraphFrames,
     libraryDependencies += cats,
+    libraryDependencies += scalatest,
+    libraryDependencies += scalactic,
     scalaSource in Compile := baseDirectory.value / "src/main/scala/",
     scalaSource in Test := baseDirectory.value / "src/test/scala/",
     resourceDirectory in Compile := baseDirectory.value / "src/main/resources/",
