@@ -17,6 +17,8 @@ team_map = {
     "Ravens": "BAL", "Saints": "NOR", "Seahawks": "SEA", "Steelers": "PIT",
     "Texans": "HOU", "Titans": "TEN", "Vikings": "MIN", "49ers": "SFO"
 }
+
+numRushers = 100
 yearStart = 1994
 yearEnd = 2017
 
@@ -46,7 +48,7 @@ for year in range(yearStart, yearEnd):
     nfl_players = [
         x[0]
         for x in zip(player_names_strings, player_positions_strings) if ('rb' in x[1].lower())
-    ][:50]
+    ][:numRushers]
 
     total_df = pd.DataFrame()
 
@@ -69,7 +71,13 @@ for year in range(yearStart, yearEnd):
         column_headers   = [th.getText() for th in individual_plays[0].findAll('th')]
         column_headers.pop(0)
 
-        game_data = [[td.getText() for td in data_rows[i].findAll('td')] for i in range(len(data_rows))]
+        game_data = [
+            [
+                td.getText()
+                for td in data_rows[i].findAll('td')
+            ]
+            for i in range(len(data_rows))
+        ]
 
         team_df = pd.DataFrame(game_data, columns=column_headers)
 
@@ -80,4 +88,4 @@ for year in range(yearStart, yearEnd):
 
         total_df = total_df.append(team_df, ignore_index=True)
 
-    total_df.to_csv("top_25_rushers_%d" % year, index=False)
+    total_df.to_csv("top_%d_rushers_%d" % (numRushers, year), index=False)
