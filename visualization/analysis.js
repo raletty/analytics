@@ -5,6 +5,7 @@ var yardRows;
 var tdRows;
 var showYards = true;
 // var filename = 'playerRushes5yds.csv';
+// var filename = 'playerRushes2yds_total.csv';
 var filename = 'playerRushes2yds.csv';
 
 d3.csv(filename, function(data) {
@@ -39,7 +40,7 @@ var loadPlayerSignature = function() {
 
   var data = showYards ? yardRows : tdRows;
   var playerData = _u.filter(data, { 'player': player });
-  displayPlayerSignature(playerData);
+  displayPlayerSignature(playerData, player);
 }
 
 var yards_csv = function() {

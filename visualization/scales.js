@@ -1,38 +1,11 @@
 'use strict';
 
-// Scale mapping number of carries to width range at a given x.
-var sigWidth = d3.scaleLinear()
-  .domain([0, 300])
-  .range([minWidth, maxWidth]);
+var svgWidth = 800;
+var svgHeight = 400;
 
-// Scale mapping distance from endzone to SVG width.
-var sigDistance = d3.scaleLinear()
-  .domain([0, 100])
-  .range([0, svgWidth]);
-
-// Scale mapping YPC at given x to SVG height.
-var sigHeight = d3.scaleLinear()
-  .domain([0, 10])
-  .range([svgHeight, 0]);
-
-// Area generator for area below generated path (area width determined by sigWidth).
-var areaAbove = d3.area()
-  .x(function(d) { return sigDistance(d.x); })
-  .y0(function (d) { return sigHeight(d.y) - sigWidth(d.w); })
-  .y1(function(d) { return Math.ceil(sigHeight(d.y)); })
-  .curve(d3.curveBasis);
-
-// Area generator for area above generated path (area width determined by sigWidth).
-var areaBelow = d3.area()
-  .x(function(d) { return sigDistance(d.x); })
-  .y0(function (d) { return sigHeight(d.y) + sigWidth(d.w); })
-  .y1(function(d) { return Math.floor(sigHeight(d.y)); })
-  .curve(d3.curveBasis);
-
-// Color scale used for filling in signatures.
-var colorScale = d3.scaleQuantize()
-  .domain(colorSchemes.custom2.domain)
-  .range(colorSchemes.custom2.range);
+// TODO: Make minWidth 0?
+var minWidth = 1;
+var maxWidth = svgHeight / 4;
 
 var colorSchemes = {
   buckets: {
@@ -82,3 +55,44 @@ var colorSchemes = {
     ]
   }
 };
+
+// Scale mapping number of carries to width range at a given x.
+var sigWidth = d3.scaleLinear()
+  .domain([0, 300])
+  .range([minWidth, maxWidth]);
+
+// Scale mapping distance from endzone to SVG width.
+var sigDistance = d3.scaleLinear()
+  .domain([0, 100])
+  .range([0, svgWidth]);
+
+// Scale mapping YPC at given x to SVG height.
+var sigHeight = d3.scaleLinear()
+  .domain([0, 10])
+  .range([svgHeight, 0]);
+
+// Area generator for area below generated path (area width determined by sigWidth).
+var areaAbove = d3.area()
+  .x(function (d) { return sigDistance(d.x); })
+  .y0(function (d) { return sigHeight(d.y) - sigWidth(d.w); })
+  .y1(function (d) { return Math.ceil(sigHeight(d.y)); })
+  .curve(d3.curveBasis);
+
+// Area generator for area above generated path (area width determined by sigWidth).
+var areaBelow = d3.area()
+  .x(function (d) { return sigDistance(d.x); })
+  .y0(function (d) { return sigHeight(d.y) + sigWidth(d.w); })
+  .y1(function (d) { return Math.floor(sigHeight(d.y)); })
+  .curve(d3.curveBasis);
+
+// Color scale used for filling in signatures.
+var colorScale = d3.scaleQuantize()
+  .domain(colorSchemes.custom2.domain)
+  .range(colorSchemes.custom2.range);
+
+// To view guiding line.
+var line = d3.line()
+  .x(function(d) { return sigDistance(d.x); })
+  .y(function(d) { return sigHeight(d.y); })
+  .curve(d3.curveBasis);
+  

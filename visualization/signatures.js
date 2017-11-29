@@ -1,17 +1,9 @@
 'use script';
 
 var svg;
-var svgWidth = 800;
-var svgHeight = 400;
 
-// TODO: Make minWidth 0?
-var minWidth = 1;
-var maxWidth = svgHeight / 4;
-
-function displayPlayerSignature(playerData) {
-  svg.selectAll("*").remove();
-
-  var data = _u.flatMap(playerData, function(playerDatum) {
+function transformPlayerData(playerData, player) {
+  return _u.flatMap(playerData, function(playerDatum) {
     var rangeSplit = playerDatum.range.split('-');
     return _u.
       range(parseInt(rangeSplit[0]), parseInt(rangeSplit[1]) + 1).
@@ -20,34 +12,37 @@ function displayPlayerSignature(playerData) {
           x: i,
           y: playerDatum.avgRush,
           w: playerDatum.numRushes,
-          c: playerDatum.nAvgRush
+          c: playerDatum.nAvgRush,
+          name: player
         };
       });
   });
+}
 
-  var gArea = svg.append("g").attr("class", "area-group");
-  gArea.append("path")
-    .datum(data)
-    .attr("class", "area area-above")
-    .attr("d", areaAbove)
-    .style("fill", "url(#area-gradient)");
+function displayPlayerSignature(playerData, player) {
 
-  gArea.append("path")
-    .datum(data)
-    .attr("class", "area area-below")
-    .attr("d", areaBelow)
-    .style("fill", "url(#area-gradient)");
+  var data = transformPlayerData(playerData, player);
+  var baseTransition = d3.transition().duration(500).ease(d3.easePoly);
 
-  // var line = d3.line()
-  //   .x(function(d) { return sigDistance(d.x); })
-  //   .y(function(d) { return sigHeight(d.y); })
-  //   .curve(d3.curveBasis);
-  //
-  // gArea.append("path")
-  //   .datum(data)
-  //   .attr("d", line)
-  //   .style("stroke", "#000")
-  //   .style("fill", "none")
+  // var state = d3.selectAll("#player-path");
+  var stateAbove = d3.selectAll("#player-path-above");
+  var stateBelow = d3.selectAll("#player-path-below");
+
+  // state.attr("class", "player-path-update")
+  //     .style("stroke", "#000")
+  //     .style("fill", "none")
+  //   .transition(baseTransition)
+  //     .attr("d", line(data));
+
+  stateBelow.attr("class", "player-update area-below")
+    .transition(baseTransition)
+      .attr("d", areaBelow(data))
+      .style("fill", "url(#area-gradient)");
+
+  stateAbove.attr("class", "player-update area-above")
+    .transition(baseTransition)
+      .attr("d", areaAbove(data))
+      .style("fill", "url(#area-gradient)");
 
   var colorData = [];
   var stripe = false; // set stripe to true to prevent linear gradient fading
@@ -67,11 +62,9 @@ function displayPlayerSignature(playerData) {
   }
 
   // generate the linear gradient used by the signature
-  gArea.append("linearGradient")
+  svg.append("linearGradient")
     .attr("id", "area-gradient")
     .attr("gradientUnits", "userSpaceOnUse")
-    .attr("y1", 0)
-    .attr("y2", 0)
     .selectAll("stop")
       .data(colorData)
       .enter().append("stop")
@@ -93,9 +86,19 @@ function displayPlayersList(players) {
 
 function init() {
   // setup the svg
-  svg = d3.select("#signature").append("svg")
-    .attr("width", svgWidth)
-    .attr("height", svgHeight);
+  svg = d3.select("#signature")
+    .append("svg")
+      .attr("width", svgWidth)
+      .attr("height", svgHeight)
+    .append("g")
+      .attr("class", "area-group2");
+
+  svg.append("linearGradient")
+    .attr("id", "area-gradient")
+    .attr("gradientUnits", "userSpaceOnUse");
+
+  svg.append("path").attr("id", "player-path-above")
+  svg.append("path").attr("id", "player-path-below");
 
   console.log("svg", svg);
 }
