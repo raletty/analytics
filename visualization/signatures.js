@@ -1,6 +1,6 @@
 'use script';
 
-var svg;
+let svg;
 
 function transformPlayerData(playerData, player) {
   return _u.flatMap(playerData, function(playerDatum) {
@@ -21,12 +21,13 @@ function transformPlayerData(playerData, player) {
 
 function displayPlayerSignature(playerData, player) {
 
-  var data = transformPlayerData(playerData, player);
-  var baseTransition = d3.transition().duration(500).ease(d3.easePoly);
+  const data = transformPlayerData(playerData, player);
+  const baseTransition = d3.transition().duration(500).ease(d3.easePoly);
 
   // var state = d3.selectAll("#player-path");
-  var stateAbove = d3.selectAll("#player-path-above");
-  var stateBelow = d3.selectAll("#player-path-below");
+
+  const stateAbove = d3.selectAll("#player-path-above");
+  const stateBelow = d3.selectAll("#player-path-below");
 
   // state.attr("class", "player-path-update")
   //     .style("stroke", "#000")
@@ -44,11 +45,11 @@ function displayPlayerSignature(playerData, player) {
       .attr("d", areaAbove(data))
       .style("fill", "url(#area-gradient)");
 
-  var colorData = [];
-  var stripe = false; // set stripe to true to prevent linear gradient fading
+  let colorData = [];
+  const stripe = false; // set stripe to true to prevent linear gradient fading
   for (var i = 0; i < data.length; i++) {
-    var prevData = data[i - 1];
-    var currData = data[i];
+    const prevData = data[i - 1];
+    const currData = data[i];
     if (stripe && prevData) {
       colorData.push({
         offset: currData.x + "%",
@@ -60,6 +61,8 @@ function displayPlayerSignature(playerData, player) {
       stopColor: colorScale(currData.c)
     });
   }
+
+  console.log(`Color data: ${JSON.stringify(colorData.slice(1, 10))} for player: ${player}`)
 
   // generate the linear gradient used by the signature
   svg.append("linearGradient")
@@ -93,9 +96,9 @@ function init() {
     .append("g")
       .attr("class", "area-group2");
 
-  svg.append("linearGradient")
-    .attr("id", "area-gradient")
-    .attr("gradientUnits", "userSpaceOnUse");
+  // svg.append("linearGradient")
+  //   .attr("id", "area-gradient")
+  //   .attr("gradientUnits", "userSpaceOnUse");
 
   svg.append("path").attr("id", "player-path-above")
   svg.append("path").attr("id", "player-path-below");
