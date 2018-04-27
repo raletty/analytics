@@ -45,6 +45,7 @@ function displayPlayerSignature(playerData, player) {
       .attr("d", areaAbove(data))
       .style("fill", "url(#area-gradient)");
 
+  // TODO: Use .ticks() to define axes
   let colorData = [];
   const stripe = false; // set stripe to true to prevent linear gradient fading
   for (var i = 0; i < data.length; i++) {
