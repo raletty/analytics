@@ -2,9 +2,30 @@
 
 let svg;
 
+/**
+ * (called as the page loads)
+ * - sets up the drop down list
+ * @param players -- player names to display
+ */
+function displayPlayersList(players) {
+  console.log("players", players);
+  let select = document.getElementById("selectPlayer");
+  for(let i = 0; i < players.length; i++) {
+    let elem = document.createElement("option");
+    elem.textContent = elem.value = players[i];
+    select.appendChild(elem);
+  }
+}
+
+/**
+ * Helper method to attach player data to each number in range.
+ * Player data attached: { yards from goal, avg rush, carries, relative performance, name }
+ * @param {*} playerData -- stats passed in for player
+ * @param {*} player     -- player name (necessary?)
+ */
 function transformPlayerData(playerData, player) {
   return _u.flatMap(playerData, function(playerDatum) {
-    var rangeSplit = playerDatum.range.split('-');
+    const rangeSplit = playerDatum.range.split('-');
     return _u.
       range(parseInt(rangeSplit[0]), parseInt(rangeSplit[1]) + 1).
       map(function(i) {
@@ -19,16 +40,24 @@ function transformPlayerData(playerData, player) {
   });
 }
 
+/**
+ * The main function; takes in player data and creates the signature:
+ * - gathers data for each player per yard number
+ * - creates player transition
+ * - attaches (with transition) data + gradient to paths using d3 area
+ * - create colorizing array based on color value from data
+ * - append linear gradient to [area-gradient] using color data
+ * @param {*} playerData
+ * @param {*} player
+ */
 function displayPlayerSignature(playerData, player) {
-
   const data = transformPlayerData(playerData, player);
   const baseTransition = d3.transition().duration(500).ease(d3.easePoly);
-
-  // var state = d3.selectAll("#player-path");
-
-  const stateAbove = d3.selectAll("#player-path-above");
-  const stateBelow = d3.selectAll("#player-path-below");
-
+  
+  let stateAbove = d3.selectAll("#player-path-above");
+  let stateBelow = d3.selectAll("#player-path-below");
+  
+  // const state = d3.selectAll("#player-path");
   // state.attr("class", "player-path-update")
   //     .style("stroke", "#000")
   //     .style("fill", "none")
@@ -45,7 +74,6 @@ function displayPlayerSignature(playerData, player) {
       .attr("d", areaAbove(data))
       .style("fill", "url(#area-gradient)");
 
-  // TODO: Use .ticks() to define axes
   let colorData = [];
   const stripe = false; // set stripe to true to prevent linear gradient fading
   for (var i = 0; i < data.length; i++) {
@@ -77,19 +105,12 @@ function displayPlayerSignature(playerData, player) {
 
 }
 
-function displayPlayersList(players) {
-  // setup the drop down list
-  console.log("players", players);
-  var select = document.getElementById("selectPlayer");
-  for(var i = 0; i < players.length; i++) {
-    var elem = document.createElement("option");
-    elem.textContent = elem.value = players[i];
-    select.appendChild(elem);
-  }
-}
-
+/**
+ * - selects the [signature] element and appends an SVG
+ * - creates a linear gradient with the id [area-gradient]
+ * - attaches two paths to the SVG that will encapsulate relevant area
+ */
 function init() {
-  // setup the svg
   svg = d3.select("#signature")
     .append("svg")
       .attr("width", svgWidth)
@@ -103,6 +124,5 @@ function init() {
 
   svg.append("path").attr("id", "player-path-above")
   svg.append("path").attr("id", "player-path-below");
-
-  console.log("svg", svg);
+  // svg.append("path").attr("id", "player-path");
 }

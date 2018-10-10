@@ -1,64 +1,54 @@
 'use strict';
 
-var players;
-var yardRows;
-var tdRows;
-var showYards = true;
-// var filename = 'playerRushes5yds.csv';
-// var filename = 'playerRushes2yds_total.csv';
-var filename = 'playerRushes2yds.csv';
+let players;
+let yardRows;
+let tdRows;
+let showYards = true;
+const filename = 'playerRushes2yds.csv';
 
+// load player data
 d3.csv(filename, function(data) {
+  // player names
   players = _u.uniq(data.map(function(d) { return d['Player']; }));
 
+  // yardage statistics for player
   yardRows = data.map(function(d) {
-    var player = d['Player'];
-    var range = d['Range'];
-    var numRushes = +d['Num Rushes'];
-    var avgRush = +d['Average Rush'];
-    var nAvgRush = +d['Normalized Average Rush'];
-    var nNumRushes = +d['Normalized Num Rushes'];
+    const player = d['Player'];
+    const range = d['Range'];
+    const numRushes = +d['Num Rushes'];
+    const avgRush = +d['Average Rush'];
+    const nAvgRush = +d['Normalized Average Rush'];
+    const nNumRushes = +d['Normalized Num Rushes'];
     return { 'player': player, 'range': range, 'avgRush': avgRush, 'numRushes': numRushes, 'nAvgRush': nAvgRush, 'nNumRushes': nNumRushes };
   });
 
+  // touchdown statistics for player
   tdRows = data.map(function(d) {
-    var player = d['Player'];
-    var range = d['Range'];
-    var numRushes = +d['Num Rushes'];
-    var numTds = +d['Num TDs'];
-    var nTdRate = +d['Normalized TD Rate'];
-    var nNumTds = +d['Normalized Num TDs'];
+    const player = d['Player'];
+    const range = d['Range'];
+    const numRushes = +d['Num Rushes'];
+    const numTds = +d['Num TDs'];
+    const nTdRate = +d['Normalized TD Rate'];
+    const nNumTds = +d['Normalized Num TDs'];
     return { 'player': player, 'range': range, 'numRushes': numRushes, 'numTds': numTds, 'nTdRate': nTdRate, 'nNumTds': nNumTds };
   });
 
   displayPlayersList(players);
 });
 
-var loadPlayerSignature = function() {
-  var player = document.getElementById("selectPlayer").value;
-  console.log("loading signature for player: ", player);
+/**
+ * entrypoint into dropdown change:
+ * - get name of selected player
+ * - select yardage or touchdown data depending on switch
+ * - filter data for only selected player data
+ */
+const loadPlayerSignature = function() {
+  const player = document.getElementById('selectPlayer').value;
+  const data = showYards ? yardRows : tdRows;
+  const playerData = _u.filter(data, { 'player': player });
+  console.log('loading signature for player: ', player);
+  console.log('playerData', playerData);
 
-  var data = showYards ? yardRows : tdRows;
-  var playerData = _u.filter(data, { 'player': player });
+  // main function to display signature!
   displayPlayerSignature(playerData, player);
-}
-
-var yards_csv = function() {
-
-  d3.csv(filename, function(data) {
-    var playerStats = data.map(function(d) {
-      var player = d['Player'];
-      var range = d['Range'];
-      var avgRush = +d['Normalized Average Rush'];
-      var numRushes = +d['Normalized Num Rushes'];
-      return {
-        'player': player,
-        'range': range,
-        'avgRush': avgRush,
-        'numRushes': numRushes
-      };
-    });
-    signatures(playerStats);
-  });
-
 }
