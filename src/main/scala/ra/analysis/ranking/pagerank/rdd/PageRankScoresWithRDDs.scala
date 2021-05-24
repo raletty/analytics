@@ -12,8 +12,7 @@ object PageRankScoresWithRDDs {
 
   def runPageRankWithRDDs[A <: Sport: GameOps](
     resetProb: Double,
-    numIters:  Int
-  ): ScoreMap = {
+    numIters:  Int ): ScoreMap = {
 
     val gameOps = implicitly[GameOps[A]]
     val gameLines = gameOps.gameLines.tail
@@ -40,8 +39,7 @@ object PageRankScoresWithRDDs {
       inputGraph    = inputGraph,
       runIterations = PageRank.run( _, _, 0.4 ),
       teamNamesRDD  = teamNamesRDD,
-      iterations    = 12
-    )
+      iterations    = 12 )
 
     iterationScoresOutput
   }

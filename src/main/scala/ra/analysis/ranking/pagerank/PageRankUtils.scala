@@ -15,9 +15,7 @@ trait PageRankUtils {
         winner     = vertexIdFromName( split( 4 ) ),
         gameNumber = split( 0 ).toInt,
         away       = split( 5 ).nonEmpty,
-        scoreDiff  = split( 7 ).toInt - split( 8 ).toInt
-      )
-    )
+        scoreDiff  = split( 7 ).toInt - split( 8 ).toInt ) )
   }
 
   def generateNbaGameDescription( gameLine: String ): Option[Describable[NBA]] = {
@@ -29,8 +27,7 @@ trait PageRankUtils {
       date       = split( 2 ),
       gameNumber = split( 1 ).toInt,
       away       = split( 3 ).nonEmpty,
-      scoreDiff  = split( 6 ).toInt - split( 7 ).toInt
-    ).optionOn( split( 5 ) == "W" )
+      scoreDiff  = split( 6 ).toInt - split( 7 ).toInt ).optionOn( split( 5 ) == "W" )
   }
 
   // Given some game lines, generate all teams for that sport.
@@ -56,10 +53,8 @@ trait PageRankUtils {
 
   // Applies a gradient builder to a set of descriptions to produce a gradient.
   def buildTeamGradientEntry[A <: Sport](
-    builder: GradientBuilder[A]
-  )(
-    descriptions: Seq[Describable[A]]
-  ): GameGradient = {
+    builder: GradientBuilder[A] )(
+    descriptions: Seq[Describable[A]] ): GameGradient = {
     descriptions.map {
       case NflGameDescription( _, _, gameNumber, away, difference ) =>
         ( gameNumber, builder.evaluateGameWeight( gameNumber, away, difference ) )

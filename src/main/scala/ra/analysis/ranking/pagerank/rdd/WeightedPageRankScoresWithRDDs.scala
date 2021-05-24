@@ -11,8 +11,7 @@ object WeightedPageRankScoresWithRDDs {
 
   def runWeightedPageRankWithRDDs[A <: Sport: GameOps](
     resetProb: Double,
-    numIters:  Int
-  ): ScoreMap = {
+    numIters:  Int ): ScoreMap = {
 
     val gameOps = implicitly[GameOps[A]]
     val gameLines = gameOps.gameLines.tail
@@ -21,8 +20,7 @@ object WeightedPageRankScoresWithRDDs {
     val sc = new SparkContext(
       new SparkConf()
         .setMaster( "local[*]" )
-        .setAppName( "WeightedPageRankScoresWithRDDs" )
-    )
+        .setAppName( "WeightedPageRankScoresWithRDDs" ) )
 
     val vidToTeamName = teams.map( team => ( vertexIdFromName( team ), team ) )
     val teamNamesRDD = VertexRDD[String]( sc.parallelize( vidToTeamName ) )
@@ -44,8 +42,7 @@ object WeightedPageRankScoresWithRDDs {
       inputGraph    = gameGraph,
       runIterations = EdgeWeightedPageRank.run[Double]( teamGradientBroadcast, 0.4 ),
       teamNamesRDD  = teamNamesRDD,
-      iterations    = 12
-    )
+      iterations    = 12 )
 
     weightedIterationOutput
   }

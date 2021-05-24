@@ -1,7 +1,7 @@
 package ra.analysis.rushing
 
 import ra.analysis.rushing.data.{ RushRange, NormalizedRushRange, AnalyzedRushRange, RushingDatum }
-import ra.analysis.util.LoadUtils.getData
+import ra.analysis.util.IOUtils.getData
 import scala.collection.breakOut
 
 object EvaluateRushers {
@@ -37,7 +37,7 @@ object EvaluateRushers {
             val toNormalizedRushRange = ( AnalyzedRushRange.produceComparisonToAverage( numRushers, 1.0 ) _ ).tupled
             val normalizedRanges = ( playerRushRanges zip averageRushRanges ).map { toNormalizedRushRange }
             ( playerName, normalizedRanges )
-        } ( breakOut )
+        }( breakOut )
 
     println( "Normalized Ranges: " )
     formatScores( normalizedPlayerRanges ).foreach( println )
@@ -62,14 +62,12 @@ object PlayerGroups {
     "Ahman Green", "Priest Holmes", "Steven Jackson", "Edgerrin James",
     "Chris Johnson", "Jamal Lewis", "Marshawn Lynch", "Curtis Martin",
     "DeMarco Murray", "LeSean McCoy", "Adrian Peterson", "Clinton Portis",
-    "Fred Taylor", "LaDainian Tomlinson", "Brian Westbrook", "Ricky Williams"
-  )
+    "Fred Taylor", "LaDainian Tomlinson", "Brian Westbrook", "Ricky Williams" )
 
   val recent = Seq(
     "Cedric Benson", "Jamaal Charles", "Maurice Jones-Drew", "Matt Forte", "Arian Foster",
     "Fred Jackson", "Chris Johnson", "Marshawn Lynch", "Doug Martin", "DeMarco Murray",
     "LeSean McCoy", "Adrian Peterson", "Ray Rice", "Jonathan Stewart", "Michael Turner",
-    "DeAngelo Williams"
-  )
+    "DeAngelo Williams" )
 
 }

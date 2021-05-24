@@ -3,7 +3,7 @@ package ra.analysis.rushing
 import org.scalactic.TolerantNumerics
 import org.scalatest.{ Inside, Matchers, FlatSpec }
 import ra.analysis.rushing.data.{ YardRange, AnalyzedRushRange, RushingDatum }
-import ra.analysis.util.LoadUtils.getData
+import ra.analysis.util.IOUtils.getData
 
 class EvaluateRushersSpec extends FlatSpec with Inside with Matchers {
 

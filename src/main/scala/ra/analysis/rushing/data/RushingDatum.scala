@@ -1,6 +1,6 @@
 package ra.analysis.rushing.data
 
-import cats.implicits._
+import cats.implicits.{ catsStdInstancesForOption => optionInstance }
 import scala.collection.breakOut
 
 import scala.util.Try
@@ -15,8 +15,7 @@ case class RushingDatum(
   location:    String,
   teamScore:   Int,
   oppScore:    Int,
-  yardsRushed: Double
-) {
+  yardsRushed: Double ) {
 
   import RushingDatum._
 
@@ -60,8 +59,7 @@ object RushingDatum {
     "RAM", "MIA", "MIN", "NWE",
     "NOR", "NYG", "NYJ", "RAI",
     "PHI", "PIT", "SDG", "SFO",
-    "SEA", "TAM", "OTI", "WAS"
-  )
+    "SEA", "TAM", "OTI", "WAS" )
 
   private final val teamTickers = Seq(
     "ARI", "ATL", "BAL", "BUF",
@@ -71,8 +69,7 @@ object RushingDatum {
     "STL", "MIA", "MIN", "NWE",
     "NOR", "NYG", "NYJ", "OAK",
     "PHI", "PIT", "SDG", "SFO",
-    "SEA", "TAM", "TEN", "WAS"
-  )
+    "SEA", "TAM", "TEN", "WAS" )
 
   val fieldToTeamMap: Map[String, String] = ( fieldTickers zip teamTickers )( breakOut )
   val tupler10 = ( optionInstance.tuple10[String, String, Int, String, Int, Int, String, Int, Int, Double, AnyVal] _ ).tupled
@@ -91,8 +88,7 @@ object RushingDatum {
       lineSplit( 6 ).toOptStr,
       teamScore.toOptInt,
       oppScore.toOptInt,
-      lineSplit( 8 ).toOptDouble
-    )
+      lineSplit( 8 ).toOptDouble )
   }
 
   def parseData( records: Seq[String] ): Seq[RushingDatum] = {
@@ -107,8 +103,7 @@ object RushingDatum {
     (
       rushingData.map( _.yardsRushed ).sum / rushingData.size,
       rushingData.size,
-      rushingData.count( _.scoredTouchdown )
-    )
+      rushingData.count( _.scoredTouchdown ) )
   }
 
   def findAverageRushByLocation( numBuckets: Int )( rushingData: Seq[RushingDatum] ): Seq[AnalyzedRushRange] = {

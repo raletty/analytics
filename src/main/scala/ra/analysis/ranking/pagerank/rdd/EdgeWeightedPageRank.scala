@@ -23,11 +23,9 @@ object EdgeWeightedPageRank {
    */
   def run[VD: ClassTag](
     gameGradient:   Broadcast[TeamGradient],
-    startingWeight: Double                  = 0.15
-  )(
+    startingWeight: Double                  = 0.15 )(
     inputGraph:    Graph[VD, GameEdgeAttribute],
-    numIterations: Int
-  ): Graph[Double, GameEdgeAttribute] = {
+    numIterations: Int ): Graph[Double, GameEdgeAttribute] = {
 
     var weightedRankGraph: Graph[Double, GameEdgeAttribute] = inputGraph.
       mapVertices { ( id, attr ) => startingWeight }
@@ -46,8 +44,7 @@ object EdgeWeightedPageRank {
           ctx.srcAttr * ( gradientMapForVertex.getOrElse( ctx.attr.week, startingWeight ) / outDegree )
         },
         _ + _,
-        TripletFields.Src
-      )
+        TripletFields.Src )
 
       prevWeightedRankGraph = weightedRankGraph
       weightedRankGraph = weightedRankGraph.joinVertices( rankUpdates ) {

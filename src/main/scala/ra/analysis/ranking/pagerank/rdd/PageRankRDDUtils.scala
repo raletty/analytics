@@ -19,8 +19,7 @@ object PageRankRDDUtils extends PageRankUtils {
     inputGraph:    Graph[Double, ED1],
     runIterations: ( Graph[Double, ED1], Int ) => Graph[Double, ED2],
     teamNamesRDD:  VertexRDD[String],
-    iterations:    Int
-  ): ScoreMap = {
+    iterations:    Int ): ScoreMap = {
     var rankOutputGraph: Graph[Double, ED2] = null
     var iterationScoresMap: ScoreMap = Map()
     teamNamesRDD.cache()
@@ -55,8 +54,7 @@ object PageRankRDDUtils extends PageRankUtils {
     inputGraph:   Graph[Double, Int],
     teamNamesRDD: VertexRDD[String],
     tolerence:    Double             = 0.001,
-    resetProb:    Double             = 0.4
-  ): RDD[( String, Double )] = {
+    resetProb:    Double             = 0.4 ): RDD[( String, Double )] = {
     val rankOutputGraph = PageRank.runUntilConvergence( inputGraph, tolerence, resetProb )
     val namedOutputGraph = rankOutputGraph.outerJoinVertices( teamNamesRDD ) {
       case ( _, score, Some( name ) ) => ( name, score )
